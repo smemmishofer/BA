@@ -789,6 +789,15 @@ function import_id(json_str) {
 
 // --- Interface to Kotlin side and local (browser) storage
 
+// Changes for socket library
+import process from 'socket:process'
+
+document.body.setAttribute('platform', process.platform)
+
+if (process.platform === 'mac') {
+    // run some very specific code for mac
+}
+
 function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
         Android.onFrontendRequest(cmdStr);
