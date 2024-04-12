@@ -19,7 +19,7 @@ function get_default_settings() {
 function toggle_changed(e) {
     // console.log("toggle ", e.id);
     tremola.settings[e.id] = e.checked;
-    backend("settings:set " + e.id + " " + e.checked)
+    custombackend("settings:set " + e.id + " " + e.checked)
     persist()
     applySetting(e.id, e.checked);
 }
@@ -59,7 +59,7 @@ function setSetting(nm, val) {
 /* async */
 function settings_wipe() {
     closeOverlay();
-    backend("wipe"); // will not return
+    custombackend("wipe"); // will not return
     /*
     window.localStorage.setItem("tremola", "null");
     backend("ready"); // will call initialize()
@@ -86,7 +86,7 @@ function btn_setWebsocketUrl() {
            document.getElementById("settings_urlInput").classList.remove("valid");
        }, 700);
    document.getElementById("settings_urlInput").blur();
-   backend("settings:set websocket_url " + new_url)
+   custombackend("settings:set websocket_url " + new_url)
    tremola.settings["websocket_url"] = new_url
    persist()
    launch_snackbar("New Websocket Url saved")
@@ -103,7 +103,7 @@ function settings_restream_posts() {
     // closeOverlay();
     setScenario('chats')
     launch_snackbar("DB restreaming launched");
-    backend("restream");
+    custombackend("restream");
 }
 
 function settings_reset_ui() {
@@ -112,11 +112,11 @@ function settings_reset_ui() {
     setScenario('chats');
     menu_redraw();
     launch_snackbar("reloading DB");
-    backend("reset");
+    custombackend("reset");
 }
 
 function settings_clear_other_feeds() {
-    backend("wipe:others")
+    custombackend("wipe:others")
     closeOverlay()
     settings_reset_ui()
 

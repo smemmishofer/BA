@@ -91,7 +91,7 @@ function onBackPressed() {
     }
     if (['chats', 'contacts', 'connex', 'board'].indexOf(curr_scenario) >= 0) {
         if (curr_scenario == 'chats')
-            backend("onBackPressed");
+            custombackend("onBackPressed");
         else if (curr_scenario == 'board')
             setScenario('kanban')
         else
@@ -195,7 +195,7 @@ function btnBridge(e) {
     if (e == 'btn:attach') {
         if (scenarioMenu[curr_scenario].length == 0)
             return;
-        backend('get:voice'); // + btoa(document.getElementById('draft').value));
+        custombackend('get:voice'); // + btoa(document.getElementById('draft').value));
         return;
     }
 
@@ -259,7 +259,7 @@ function closeOverlay() {
     overlayIsActive = false;
 
     if (curr_img_candidate != null) {
-        backend('del:blob ' + curr_img_candidate);
+        custombackend('del:blob ' + curr_img_candidate);
         curr_img_candidate = null;
     }
 }
@@ -343,7 +343,7 @@ function generateQR(s) {
 function qr_scan_start(target) {
     // test if Android is defined ...
     curr_qr_scan_target = target
-    backend("qrscan.init");
+    custombackend("qrscan.init");
     closeOverlay();
 }
 
@@ -400,7 +400,7 @@ function qr_scan_confirmed() {
     var c = {"alias": a, "initial": i, "color": colors[Math.floor(colors.length * Math.random())], "iam": "", "forgotten": false};
     tremola.contacts[s] = c;
     persist();
-    backend("add:contact " + s + " " + btoa(a))
+    custombackend("add:contact " + s + " " + btoa(a))
     load_contact_item([s, c]);
     closeOverlay();
 }

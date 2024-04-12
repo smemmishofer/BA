@@ -227,7 +227,7 @@ function board_send_to_backend(data) {
     var op = data['cmd'][0] //btoa(data['cmd'][0])
     var args = data['cmd'].length > 1 ? btoa(data['cmd'].slice(1).map(unicodeStringToTypedArray).map(btoa)) : "null"
     var to_backend = ['kanban', bid, prevs, op, args]
-    backend(to_backend.join(" "))
+    custombackend(to_backend.join(" "))
 }
 
 function kanban_new_event(e) {
