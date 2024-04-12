@@ -2,6 +2,9 @@
 
 "use strict";
 
+import {curr_img_candidate} from "./tremola.js";
+import {close_board_context_menu} from "./board_ui.js";
+
 var overlayIsActive = false;
 
 var display_or_not = [
@@ -106,7 +109,7 @@ function onBackPressed() {
     }
 }
 
-function setScenario(s) {
+export function setScenario(s) {
     // console.log('setScenario ' + s)
     closeOverlay();
     var lst = scenarioDisplay[s];
@@ -223,7 +226,7 @@ function menu_settings() {
     c.innerHTML = "<div style='text-align: center;'><font size=+1><strong>Settings</strong></font></div>";
 }
 
-function closeOverlay() {
+export function closeOverlay() {
     document.getElementById('menu').style.display = 'none';
     document.getElementById('qr-overlay').style.display = 'none';
     document.getElementById('preview-overlay').style.display = 'none';

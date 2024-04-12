@@ -2,7 +2,11 @@
 
 "use strict";
 
-var tremola;
+import {closeOverlay, setScenario} from "./tremola_ui.js";
+import {setSetting} from "./tremola_settings.js";
+import {load_board_list} from "./board_ui.js";
+
+export var tremola;
 var curr_chat;
 var qr;
 var myId;
@@ -13,7 +17,7 @@ var new_contact_id = '';
 var colors = ["#d9ceb2", "#99b2b7", "#e6cba5", "#ede3b4", "#8b9e9b", "#bd7578", "#edc951",
     "#ffd573", "#c2a34f", "#fbb829", "#ffab03", "#7ab317", "#a0c55f", "#8ca315",
     "#5191c1", "#6493a7", "#bddb88"]
-var curr_img_candidate = null;
+export var curr_img_candidate = null;
 var pubs = []
 var wants = {}
 
@@ -380,7 +384,8 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     pl.insertRow(pl.rows.length).innerHTML = row;
 }
 
-function load_chat(nm) {
+export function load_chat(nm) {
+    console.log('load_chat function called!')
     var ch, pl, e;
     ch = tremola.chats[nm]
     if (ch.timeline == null)
@@ -428,7 +433,7 @@ function load_chat_title(ch) {
     c.innerHTML = box;
 }
 
-function load_chat_list() {
+export function load_chat_list() {
     var meOnly = recps2nm([myId])
     // console.log('meOnly', meOnly)
     document.getElementById('lst:chats').innerHTML = '';
@@ -464,6 +469,7 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
     item.setAttribute('class', 'chat_item_div'); // old JS (SDK 23)
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
     row = "<button class='chat_item_button w100" + bg + "' onclick='load_chat(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
+    console.log('load_chat function added!!')
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
@@ -475,7 +481,7 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
     set_chats_badge(nm)
 }
 
-function load_contact_list() {
+export function load_contact_list() {
     document.getElementById("lst:contacts").innerHTML = '';
     for (var id in tremola.contacts)
         if (!tremola.contacts[id].forgotten)
@@ -798,7 +804,14 @@ if (process.platform === 'mac') {
     // run some very specific code for mac
 }
 
-function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
+async function main () {
+    console.log(process.platform)
+    backend('ready')
+}
+
+window.addEventListener('DOMContentLoaded', main)
+
+export function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
         Android.onFrontendRequest(cmdStr);
         return;

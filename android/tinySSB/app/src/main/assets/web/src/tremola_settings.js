@@ -2,6 +2,8 @@
 
 "use strict";
 
+import {load_chat_list, load_contact_list} from "./tremola.js";
+
 function get_default_settings() {
     return {
         'enable_preview': false,
@@ -46,7 +48,7 @@ function applySetting(nm, val) {
     }
 }
 
-function setSetting(nm, val) {
+export function setSetting(nm, val) {
     // console.log("setting", nm, val)
     if (nm == "websocket_url") {
       document.getElementById("settings_urlInput").value = val

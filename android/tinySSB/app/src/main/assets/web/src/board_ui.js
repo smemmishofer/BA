@@ -2,6 +2,8 @@
 
 "use strict";
 
+import {tremola} from "./tremola.js"
+
 const Color = { // all available colors for card title
     BLACK: 'black',
     RED: 'red',
@@ -69,7 +71,7 @@ function dragDrop(ev) {
     }
 }
 
-function load_board_list() {
+export function load_board_list() {
     document.getElementById('lst:kanban').innerHTML = '';
     if (Object.keys(tremola.board).length === 0)
         return
@@ -274,7 +276,7 @@ function equalArrays(array1, array2) {
     return true
 }
 
-function close_board_context_menu() {
+export function close_board_context_menu() {
     if (curr_context_menu) {
         var context_menu = document.getElementById(curr_context_menu)
         if (context_menu)
