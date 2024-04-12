@@ -15,9 +15,9 @@
   >
   <link rel="stylesheet" type="text/css" href="tremola.css" media="screen" />
   <script type="text/javascript" charset="UTF-8" src="scuttlesort.js"></script>
+  <script type="module" src="tremola_ui.js"></script>
   <script type="module" src="tremola.js"></script>
   <script type="module" src="tremola_settings.js"></script>
-  <script type="module" src="tremola_ui.js"></script>
   <script type="text/javascript" charset="UTF-8" src="qrcode.min.js"></script>
   <script type="text/javascript" charset="UTF-8" src="pinch-zoom.min.js"></script>
   <script type="text/javascript" charset="UTF-8" src="board.js"></script>
@@ -549,7 +549,7 @@
     <tr><td width=95%><textarea id='draft' rows=3 placeholder='Tap here to type'></textarea>
       <!-- td width=5% height=100%><button id='btn:attach' class="flat passive buttontext"><font size=+2>&#x1F4CE;</font><br><font size=small>Attach</font></button></td -->
       <td width=8% height=100%><button id='btn:attach' class="flat white buttontext" onclick="btnBridge(this);" style="background-image: url('img/record.svg'); fill: #fff; width: 50px; height: 50px; margin-bottom: 4px;"></button>
-      <td width=5% height=100%><button id='btn:preview' class="flat passive buttontext" onclick="showPreview();" style="background-image: url('img/send-button.svg'); width: 50px; height: 50px; margin-bottom: 4px;">&nbsp;<!-- font size=+2>&#x1F440;</font><br><font size=small>Preview</font --></button>
+      <td width=5% height=100%><button id='btn:preview' class="flat passive buttontext" style="background-image: url('img/send-button.svg'); width: 50px; height: 50px; margin-bottom: 4px;">&nbsp;<!-- font size=+2>&#x1F440;</font><br><font size=small>Preview</font --></button>
   </table>
 
   <div id='div:confirm-members' class=neutral style="height: 36px; align-content: center; border: 3px inset #ebf4fa /*var(--light)*/; border-radius: 2pt; margin: 3px; margin-top: 20px; display: none; flex-direction: row; justify-content: center; align-items: center;">

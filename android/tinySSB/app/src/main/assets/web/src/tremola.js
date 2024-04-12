@@ -2,12 +2,15 @@
 
 "use strict";
 
-import {closeOverlay, setScenario} from "./tremola_ui.js";
+import {closeOverlay, setScenario, showPreview2} from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {load_board_list} from "./board_ui.js";
 
+// Changes for socket library
+import process from 'socket:process'
+
 export var tremola;
-var curr_chat;
+export var curr_chat;
 var qr;
 var myId;
 var localPeers = {}; // feedID ~ [isOnline, isConnected] - TF, TT, FT - FF means to remove this entry
@@ -284,7 +287,7 @@ function menu_pick_image() {
 
 // ---
 
-function new_text_post(s) {
+export function new_text_post(s) {
     if (s.length == 0) {
         return;
     }
@@ -456,7 +459,7 @@ export function load_chat_list() {
                 load_chat_item(p)
 }
 
-function load_chat_item(nm) { // appends a button for conversation with name nm to the conv list
+async function load_chat_item(nm) { // appends a button for conversation with name nm to the conv list
     var cl, mem, item, bg, row, badge, badgeId, cnt;
     cl = document.getElementById('lst:chats');
     // console.log(nm)
@@ -468,7 +471,7 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
     // item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
     item.setAttribute('class', 'chat_item_div'); // old JS (SDK 23)
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
-    row = "<button class='chat_item_button w100" + bg + "' onclick='load_chat(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
+    row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
     console.log('load_chat function added!!')
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
@@ -478,6 +481,15 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
     row += ""
     item.innerHTML = row;
     cl.appendChild(item);
+
+    // Get the newly created button element
+    var button = item.querySelector('button.chat_item_button');
+
+    // Assign the load_chat function to the onclick event handler of the button
+    button.onclick = function() {
+        load_chat(nm);
+    };
+
     set_chats_badge(nm)
 }
 
@@ -751,7 +763,7 @@ function id2b32(str) { // derive a shortname from the SSB id
     return '??'
 }
 
-function escapeHTML(str) {
+export function escapeHTML(str) {
     return new Option(str).innerHTML;
 }
 
@@ -760,7 +772,7 @@ function recps2nm(rcps) { // use concat of sorted FIDs as internal name for conv
     return rcps.sort().join('').replace(/.ed25519/g, '');
 }
 
-function recps2display(rcps) {
+export function recps2display(rcps) {
     if (rcps == null) return 'ALL';
     var lst = rcps.map(function (fid) {
         return fid2display(fid)
@@ -796,7 +808,6 @@ function import_id(json_str) {
 // --- Interface to Kotlin side and local (browser) storage
 
 // Changes for socket library
-import process from 'socket:process'
 
 document.body.setAttribute('platform', process.platform)
 
@@ -807,6 +818,12 @@ if (process.platform === 'mac') {
 async function main () {
     console.log(process.platform)
     backend('ready')
+
+    var button = document.getElementById('btn:preview');
+    // Assign the load_chat function to the onclick event handler of the button
+    button.onclick = function() {
+        showPreview2();
+    };
 }
 
 window.addEventListener('DOMContentLoaded', main)

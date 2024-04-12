@@ -26,7 +26,7 @@ function toggle_changed(e) {
     applySetting(e.id, e.checked);
 }
 
-function getSetting(nm) {
+export function getSetting(nm) {
     return document.getElementById(nm).checked
 }
 

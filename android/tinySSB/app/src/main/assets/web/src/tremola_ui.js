@@ -2,8 +2,9 @@
 
 "use strict";
 
-import {curr_img_candidate} from "./tremola.js";
+import {curr_chat, curr_img_candidate, escapeHTML, new_text_post, recps2display} from "./tremola.js";
 import {close_board_context_menu} from "./board_ui.js";
+import {getSetting} from "./tremola_settings.js";
 
 var overlayIsActive = false;
 
@@ -87,7 +88,7 @@ const QR_SCAN_TARGET = {
 
 var curr_qr_scan_target = QR_SCAN_TARGET.ADD_CONTACT
 
-function onBackPressed() {
+export function onBackPressed() {
     if (overlayIsActive) {
         closeOverlay();
         return;
@@ -176,7 +177,7 @@ export function setScenario(s) {
     }
 }
 
-function btnBridge(e) {
+export function btnBridge(e) {
     var e = e.id, m = '';
     if (['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex', 'btn:kanban'].indexOf(e) >= 0) {
         setScenario(e.substring(4));
@@ -205,7 +206,7 @@ function btnBridge(e) {
     // if (typeof Android != "undefined") { Android.onFrontendRequest(e); }
 }
 
-function menu_settings() {
+export function menu_settings() {
     closeOverlay();
     setScenario('settings')
     document.getElementById("settings_urlInput").classList.remove("invalid")
@@ -267,7 +268,7 @@ export function closeOverlay() {
     }
 }
 
-function showPreview() {
+export function showPreview2() {
     var draft = escapeHTML(document.getElementById('draft').value);
     if (draft.length == 0) return;
     if (!getSetting("enable_preview")) {
