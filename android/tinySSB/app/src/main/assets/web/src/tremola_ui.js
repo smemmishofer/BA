@@ -5,6 +5,7 @@
 import {curr_chat, curr_img_candidate, myId, qr, tremola, escapeHTML, new_text_post, recps2display} from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
+import {curr_item} from "./board.js";
 
 var overlayIsActive = false;
 

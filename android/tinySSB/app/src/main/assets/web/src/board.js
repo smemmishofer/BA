@@ -2,10 +2,12 @@
 
 "use strict";
 
+import {unicodeStringToTypedArray} from "./tremola.js";
+
 var curr_board;
 var curr_context_menu;
 var curr_column;
-var curr_item;
+export var curr_item;
 
 var curr_rename_item;
 
