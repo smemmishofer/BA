@@ -2,18 +2,27 @@
 
 "use strict";
 
-import {closeOverlay, setScenario, showPreview2, curr_scenario, onBackPressed} from "./tremola_ui.js";
+import {
+    closeOverlay,
+    setScenario,
+    showPreview2,
+    curr_scenario,
+    onBackPressed,
+    btnBridge,
+    showQR, generateQR
+} from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {load_board_list} from "./board_ui.js";
 
 // Changes for socket library
 import process from 'socket:process'
 import path from 'socket:path'
+import {Encryption, network} from "socket:network";
 
 export var tremola;
 export var curr_chat;
-var qr;
-var myId;
+export var qr;
+export var myId;
 var localPeers = {}; // feedID ~ [isOnline, isConnected] - TF, TT, FT - FF means to remove this entry
 var must_redraw = false;
 var edit_target = '';
@@ -818,21 +827,109 @@ async function main () {
     console.log('Current Platform: ', process.platform)
     console.log('Documents Path: ', path.DOCUMENTS)
     backend('ready')
+    await initP2P()
 
     var prevbutton = document.getElementById('btn:preview');
     // Assign the load_chat function to the onclick event handler of the button
     prevbutton.onclick = function() {
         showPreview2();
     };
-
     var backbutton = document.getElementById('back');
     // Assign the load_chat function to the onclick event handler of the button
     backbutton.onclick = function() {
         onBackPressed();
     };
+    var btnchats = document.getElementById('btn:chats');
+    // Assign the load_chat function to the onclick event handler of the button
+    btnchats.onclick = function() {
+        btnBridge(this);
+    };
+    var btnkanban = document.getElementById('btn:kanban');
+    // Assign the load_chat function to the onclick event handler of the button
+    btnkanban.onclick = function() {
+        btnBridge(this);
+    };
+    var btncontacts = document.getElementById('btn:contacts');
+    // Assign the load_chat function to the onclick event handler of the button
+    btncontacts.onclick = function() {
+        btnBridge(this);
+    };
+    var btnattach = document.getElementById('btn:attach');
+    // Assign the load_chat function to the onclick event handler of the button
+    btnattach.onclick = function() {
+        btnBridge(this);
+    };
+    var btnmenu = document.getElementById('btn:menu');
+    // Assign the load_chat function to the onclick event handler of the button
+    btnmenu.onclick = function() {
+        btnBridge(this);
+    };
+/*    var overlaybg = document.getElementById('overlay-bg');
+    // Assign the load_chat function to the onclick event handler of the button
+    overlaybg.onclick = function() {
+        closeOverlay();
+    };
+    var overlaytrans = document.getElementById('overlay-trans');
+    // Assign the load_chat function to the onclick event handler of the button
+    overlaytrans.onclick = function() {
+        closeOverlay();
+    };
+    var overlaybgcore = document.getElementById('overlay-bg-core');
+    // Assign the load_chat function to the onclick event handler of the button
+    overlaybgcore.onclick = function() {
+        closeOverlay();
+    };
+    var overlaytranscore = document.getElementById('overlay-trans-core');
+    // Assign the load_chat function to the onclick event handler of the button
+    overlaytranscore.onclick = function() {
+        closeOverlay();
+    };*/
 }
 
 window.addEventListener('DOMContentLoaded', main)
+
+// Try out socket P2P functionality:
+// (identical code as in 'P2P Guide')
+let cats;
+
+async function initP2P() {
+    try {
+        //
+// Create (or read from storage) a peer ID and a key-pair for signing.
+//
+        const peerId = await Encryption.createId()
+        const signingKeys = await Encryption.createKeyPair()
+
+//
+// Create (or read from storage) a clusterID and a symmetrical/shared key.
+//
+        const clusterId = await Encryption.createClusterId('TEST')
+        const sharedKey = await Encryption.createSharedKey('TEST')
+
+//
+// Create a socket that can send a receive network events. The clusterId
+// helps to find other peers and be found by other peers.
+//
+        const socket = await network({ peerId, clusterId, signingKeys })
+
+//
+// Create a subcluster (a partition within your cluster)
+//
+        cats = await socket.subcluster({ sharedKey })
+    } catch (err) {
+        console.log('Error while initializing P2P')
+        console.error(err)
+    }
+}
+
+function sendP2P(msg) {
+    try {
+        cats.emit('mew', msg)
+        console.log('msg emitted into P2P network: ', msg)
+    } catch (err) {
+        console.error(err)
+    }
+}
 
 export function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
@@ -861,6 +958,7 @@ export function backend(cmdStr) { // send this to Kotlin (or simulate in case of
             'public': ["TAV", atob(cmdStr[0]), null, Date.now()].concat(args)
         }
         b2f_new_event(e)
+        sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
         if (prev != "null") {

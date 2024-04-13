@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {curr_chat, curr_img_candidate, escapeHTML, new_text_post, recps2display} from "./tremola.js";
+import {curr_chat, curr_img_candidate, myId, qr, escapeHTML, new_text_post, recps2display} from "./tremola.js";
 import {close_board_context_menu} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
 
@@ -29,7 +29,7 @@ var scenarioDisplay = {
     'board': ['div:back', 'core', 'div:board']
 }
 
-var scenarioMenu = {
+export var scenarioMenu = {
     'chats': [['Connected Devices', 'menu_connection'], // '['New conversation', 'menu_new_conversation'],' TODO reactivate when encrypted chats are implemented
         ['Settings', 'menu_settings'],
         ['About', 'menu_about']],
@@ -285,14 +285,14 @@ export function showPreview2() {
     overlayIsActive = true;
 }
 
-function menu_about() {
+export function menu_about() {
     closeOverlay()
     document.getElementById('about-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
     overlayIsActive = true;
 }
 
-function plus_button() {
+export function plus_button() {
     closeOverlay();
     if (curr_scenario == 'chats') {
         menu_new_conversation();
@@ -305,7 +305,7 @@ function plus_button() {
     }
 }
 
-function launch_snackbar(txt) {
+export function launch_snackbar(txt) {
     var sb = document.getElementById("snackbar");
     sb.innerHTML = txt;
     sb.className = "show";
@@ -316,11 +316,13 @@ function launch_snackbar(txt) {
 
 // --- QR display and scan
 
-function showQR() {
+export function showQR() {
     generateQR('did:ssb:ed25519:' + myId.substring(1).split('.')[0])
+    console.log('showQR called')
 }
 
-function generateQR(s) {
+export function generateQR(s) {
+    console.log('generateQR called')
     document.getElementById('qr-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
     document.getElementById('qr-text').innerHTML = s;
@@ -424,7 +426,7 @@ function modal_img(img) {
     );
 }
 
-function menu_connection() {
+export function menu_connection() {
     closeOverlay();
     //refresh_connection_progressbar()
 

@@ -43,11 +43,11 @@
 
   <div id='hdr' style="height: 45px;margin: 3px; width: calc(100% - 6px);">
   <div style="display:flex; flex-direction: row; justify-content: center; align-items: center;">
-    <div id="div:qr" style="align: left;"><button id='btn:qr' class="flat" onclick="showQR();" style="background-color: transparent;"><font size=+2><strong>&nbsp;&#x2680;&nbsp;</strong></font></button></div>
+    <div id="div:qr" style="align: left;"><button id='btn:qr' class="flat" style="background-color: transparent;"><font size=+2><strong>&nbsp;&#x2680;&nbsp;</strong></font></button></div>
     <div id="div:back" style="display: none; padding-right: 10px;"><button id='back' class="flat buttontext" style="background-image: url('img/back.svg'); background-color: transparent; height: 25px; width: 25px; margin-left: 5px; margin-top: 2px;" onclick="onBackPressed();">&nbsp;<!--font size=+2><strong>&nbsp;&#x276E;&nbsp;</strong></font --></button></div>
     <div id='tremolaTitle' align=center style="padding-top: 2pt; width: 100%;font-family: Helvetica;font-weight: 900;"><font size=+2 color=#e85132>t i n y S S B<!-- &#x26F0; --></font></div>
     <div id='conversationTitle' style="display: none; padding-left: 5px; padding-right: 5px; padding-top: 2px; color: #e85132; font-size: small; overflow: hidden; width: 100%;">ABC</div>
-    <div><button id='btn:menu' class="flat neutral" onclick="btnBridge(this);" style="vertical-align: top; background-color: transparent; padding-top: 3pt;"><font size=+1>&nbsp;<strong>&#9776;</strong>&nbsp;</font></button></div>
+    <div><button id='btn:menu' class="flat neutral" style="vertical-align: top; background-color: transparent; padding-top: 3pt;"><font size=+1>&nbsp;<strong>&#9776;</strong>&nbsp;</font></button></div>
   </div>
 </div>
 
@@ -105,16 +105,16 @@
     <button class=float_button onclick="plus_button();">+</button>
   </div>
 
-  <div id='overlay-bg' class='overlay-bg' onclick="closeOverlay();">
+  <div id='overlay-bg' class='overlay-bg' onclick="closeOverlay()">
   </div>
 
-  <div id='overlay-trans' class='overlay-trans' onclick="closeOverlay();">
+  <div id='overlay-trans' class='overlay-trans' onclick="closeOverlay()">
   </div>
 
-  <div id='overlay-bg-core' class='overlay-bg-core' onclick="closeOverlay();">
+  <div id='overlay-bg-core' class='overlay-bg-core' onclick="closeOverlay()">
   </div>
 
-  <div id='overlay-trans-core' class='overlay-trans-core' onclick="closeOverlay();">
+  <div id='overlay-trans-core' class='overlay-trans-core' onclick="closeOverlay()">
   </div>
 
   <div id='new_chat-overlay' class='qr-overlay'>
@@ -538,9 +538,9 @@
 <div id='div:footer' class=neutral style="height: 56px; align-content: center; border: 3px inset #ebf4fa /*var(--light)*/; border-radius: 2px; margin: 3px; width: calc(100% - 12px);">
 
   <table width=100% cellpadding="2pt"><tr>
-    <td width=33%><button id='btn:chats'    class="w100 flat active buttontext" onclick="btnBridge(this);" style="background-image: url('img/chat.svg');">&nbsp;<!-- font size=+3>&#x1F4E8;</font><br><font size=small>Chats</font --></button>
-    <td width=33%><button id='btn:kanban'   class="w100 flat passive buttontext" onclick="btnBridge(this);" style="background-image: url('img/kanban.svg');">&nbsp;<!-- font size=+3>&#x1F5E3;</font><br><font size=small>Board</font --></button>
-    <td width=33%><button id='btn:contacts' class="w100 flat passive buttontext" onclick="btnBridge(this);" style="background-image: url('img/contacts.svg');">&nbsp;<!-- font size=+3>&#x1F465;</font><br><font size=small>Contacts</font --></button>
+    <td width=33%><button id='btn:chats'    class="w100 flat active buttontext" style="background-image: url('img/chat.svg');">&nbsp;<!-- font size=+3>&#x1F4E8;</font><br><font size=small>Chats</font --></button>
+    <td width=33%><button id='btn:kanban'   class="w100 flat passive buttontext" style="background-image: url('img/kanban.svg');">&nbsp;<!-- font size=+3>&#x1F5E3;</font><br><font size=small>Board</font --></button>
+    <td width=33%><button id='btn:contacts' class="w100 flat passive buttontext" style="background-image: url('img/contacts.svg');">&nbsp;<!-- font size=+3>&#x1F465;</font><br><font size=small>Contacts</font --></button>
   </table>
 
 </div>
@@ -548,7 +548,7 @@
   <table id="div:textarea" class="neutral" style="height: 56px; width: calc(100% - 6pt); display: none; border: 3px inset #ebf4fa /*var(--light)*/; margin: 3pt;" width=100%>
     <tr><td width=95%><textarea id='draft' rows=3 placeholder='Tap here to type'></textarea>
       <!-- td width=5% height=100%><button id='btn:attach' class="flat passive buttontext"><font size=+2>&#x1F4CE;</font><br><font size=small>Attach</font></button></td -->
-      <td width=8% height=100%><button id='btn:attach' class="flat white buttontext" onclick="btnBridge(this);" style="background-image: url('img/record.svg'); fill: #fff; width: 50px; height: 50px; margin-bottom: 4px;"></button>
+      <td width=8% height=100%><button id='btn:attach' class="flat white buttontext" style="background-image: url('img/record.svg'); fill: #fff; width: 50px; height: 50px; margin-bottom: 4px;"></button>
       <td width=5% height=100%><button id='btn:preview' class="flat passive buttontext" style="background-image: url('img/send-button.svg'); width: 50px; height: 50px; margin-bottom: 4px;">&nbsp;<!-- font size=+2>&#x1F440;</font><br><font size=small>Preview</font --></button>
   </table>
 
