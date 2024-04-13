@@ -2,12 +2,13 @@
 
 "use strict";
 
-import {closeOverlay, setScenario, showPreview2} from "./tremola_ui.js";
+import {closeOverlay, setScenario, showPreview2, curr_scenario, onBackPressed} from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {load_board_list} from "./board_ui.js";
 
 // Changes for socket library
 import process from 'socket:process'
+import path from 'socket:path'
 
 export var tremola;
 export var curr_chat;
@@ -388,7 +389,6 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
 }
 
 export function load_chat(nm) {
-    console.log('load_chat function called!')
     var ch, pl, e;
     ch = tremola.chats[nm]
     if (ch.timeline == null)
@@ -472,7 +472,6 @@ async function load_chat_item(nm) { // appends a button for conversation with na
     item.setAttribute('class', 'chat_item_div'); // old JS (SDK 23)
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
     row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
-    console.log('load_chat function added!!')
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
@@ -816,13 +815,20 @@ if (process.platform === 'mac') {
 }
 
 async function main () {
-    console.log(process.platform)
+    console.log('Current Platform: ', process.platform)
+    console.log('Documents Path: ', path.DOCUMENTS)
     backend('ready')
 
-    var button = document.getElementById('btn:preview');
+    var prevbutton = document.getElementById('btn:preview');
     // Assign the load_chat function to the onclick event handler of the button
-    button.onclick = function() {
+    prevbutton.onclick = function() {
         showPreview2();
+    };
+
+    var backbutton = document.getElementById('back');
+    // Assign the load_chat function to the onclick event handler of the button
+    backbutton.onclick = function() {
+        onBackPressed();
     };
 }
 
