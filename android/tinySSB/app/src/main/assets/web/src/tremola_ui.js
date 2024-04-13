@@ -2,8 +2,8 @@
 
 "use strict";
 
-import {curr_chat, curr_img_candidate, myId, qr, escapeHTML, new_text_post, recps2display} from "./tremola.js";
-import {close_board_context_menu} from "./board_ui.js";
+import {curr_chat, curr_img_candidate, myId, qr, tremola, escapeHTML, new_text_post, recps2display} from "./tremola.js";
+import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
 
 var overlayIsActive = false;
@@ -318,11 +318,9 @@ export function launch_snackbar(txt) {
 
 export function showQR() {
     generateQR('did:ssb:ed25519:' + myId.substring(1).split('.')[0])
-    console.log('showQR called')
 }
 
 export function generateQR(s) {
-    console.log('generateQR called')
     document.getElementById('qr-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
     document.getElementById('qr-text').innerHTML = s;

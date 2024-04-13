@@ -12,7 +12,7 @@ import {
     showQR, generateQR
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
-import {load_board_list} from "./board_ui.js";
+import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list} from "./board_ui.js";
 
 // Changes for socket library
 import process from 'socket:process'
@@ -812,23 +812,7 @@ function import_id(json_str) {
     return true
 }
 
-
-// --- Interface to Kotlin side and local (browser) storage
-
-// Changes for socket library
-
-document.body.setAttribute('platform', process.platform)
-
-if (process.platform === 'mac') {
-    // run some very specific code for mac
-}
-
-async function main () {
-    console.log('Current Platform: ', process.platform)
-    console.log('Documents Path: ', path.DOCUMENTS)
-    backend('ready')
-    await initP2P()
-
+function initializeAllButtons() {
     var prevbutton = document.getElementById('btn:preview');
     // Assign the load_chat function to the onclick event handler of the button
     prevbutton.onclick = function() {
@@ -864,7 +848,12 @@ async function main () {
     btnmenu.onclick = function() {
         btnBridge(this);
     };
-/*    var overlaybg = document.getElementById('overlay-bg');
+    var divqr = document.getElementById('btn:qr');
+    // Assign the load_chat function to the onclick event handler of the button
+    divqr.onclick = function() {
+        showQR();
+    };
+    var overlaybg = document.getElementById('overlay-bg');
     // Assign the load_chat function to the onclick event handler of the button
     overlaybg.onclick = function() {
         closeOverlay();
@@ -883,7 +872,36 @@ async function main () {
     // Assign the load_chat function to the onclick event handler of the button
     overlaytranscore.onclick = function() {
         closeOverlay();
-    };*/
+    };
+    var btncreatepersonalboardaccept = document.getElementById('btn:create_personal_board_accept');
+    // Assign the load_chat function to the onclick event handler of the button
+    btncreatepersonalboardaccept.onclick = function() {
+        btn_create_personal_board_accept();
+    };
+    var btncreatepersonalboarddecline = document.getElementById('btn:create_personal_board_decline');
+    // Assign the load_chat function to the onclick event handler of the button
+    btncreatepersonalboarddecline.onclick = function() {
+        btn_create_personal_board_decline();
+    };
+}
+
+// --- Interface to Kotlin side and local (browser) storage
+
+// Changes for socket library
+
+document.body.setAttribute('platform', process.platform)
+
+if (process.platform === 'mac') {
+    // run some very specific code for mac
+}
+
+async function main () {
+    console.log('Current Platform: ', process.platform)
+    console.log('Documents Path: ', path.DOCUMENTS)
+    backend('ready')
+    await initP2P()
+
+    initializeAllButtons()
 }
 
 window.addEventListener('DOMContentLoaded', main)

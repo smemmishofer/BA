@@ -86,8 +86,8 @@
         (You can also generate new kanban boards using the + icon)
       </div>
       <div>
-        <button class="kanban_create_personal_btn" style="background-image: url('img/checked.svg');" onclick="btn_create_personal_board_accept()"></button>
-        <button class="kanban_create_personal_btn" style="background-image: url('img/cancel.svg'); background-position-x: -1.5px;" onclick="btn_create_personal_board_decline()"></button>
+        <button id="btn:create_personal_board_accept" class="kanban_create_personal_btn" style="background-image: url('img/checked.svg');"></button>
+        <button id="btn:create_personal_board_decline" class="kanban_create_personal_btn" style="background-image: url('img/cancel.svg'); background-position-x: -1.5px;"></button>
       </div>
     </div>
   </div>
@@ -105,16 +105,16 @@
     <button class=float_button onclick="plus_button();">+</button>
   </div>
 
-  <div id='overlay-bg' class='overlay-bg' onclick="closeOverlay()">
+  <div id='overlay-bg' class='overlay-bg'>
   </div>
 
-  <div id='overlay-trans' class='overlay-trans' onclick="closeOverlay()">
+  <div id='overlay-trans' class='overlay-trans'>
   </div>
 
-  <div id='overlay-bg-core' class='overlay-bg-core' onclick="closeOverlay()">
+  <div id='overlay-bg-core' class='overlay-bg-core'>
   </div>
 
-  <div id='overlay-trans-core' class='overlay-trans-core' onclick="closeOverlay()">
+  <div id='overlay-trans-core' class='overlay-trans-core'>
   </div>
 
   <div id='new_chat-overlay' class='qr-overlay'>

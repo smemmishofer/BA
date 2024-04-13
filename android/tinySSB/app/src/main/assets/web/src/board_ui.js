@@ -3,6 +3,7 @@
 "use strict";
 
 import {tremola} from "./tremola.js"
+import {closeOverlay} from "./tremola_ui.js";
 
 const Color = { // all available colors for card title
     BLACK: 'black',
@@ -15,7 +16,7 @@ const Color = { // all available colors for card title
     ORANGE: 'orange'
 }
 
-var display_create_personal_board = true // Whether to prompt the user to create a personal board when they open the Kanban application
+export var display_create_personal_board = true // Whether to prompt the user to create a personal board when they open the Kanban application
 
 function allowDrop(ev) {
     ev.preventDefault();
@@ -129,18 +130,18 @@ function create_personal_board() {
     createBoard('Personal Board', [FLAG.PERSONAL])
 }
 
-function menu_create_personal_board() {
+export function menu_create_personal_board() {
     closeOverlay()
     document.getElementById('kanban-create-personal-board-overlay').style.display = 'initial'
     document.getElementById('overlay-trans-core').style.display = 'initial'
 }
 
-function btn_create_personal_board_accept() {
+export function btn_create_personal_board_accept() {
     create_personal_board()
     closeOverlay()
 }
 
-function btn_create_personal_board_decline() {
+export function btn_create_personal_board_decline() {
     closeOverlay()
     display_create_personal_board = false
 }
