@@ -4,7 +4,7 @@
 
 import {tremola} from "./tremola.js"
 import {closeOverlay} from "./tremola_ui.js";
-import {setCurrContextMenu, getCurrContextMenu, getCurrItem} from "./board.js";
+import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
 
 const Color = { // all available colors for card title
     BLACK: 'black',

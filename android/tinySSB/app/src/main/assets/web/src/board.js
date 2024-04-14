@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {unicodeStringToTypedArray} from "./tremola.js";
+import {backend, unicodeStringToTypedArray} from "./tremola.js";
 import {closeOverlay} from "./tremola_ui.js";
 
 var curr_board;
@@ -34,7 +34,7 @@ const Operation = {
     LEAVE: 'leave'
 }
 
-const FLAG = {
+export const FLAG = {
     PERSONAL: 'personal'
 }
 
@@ -54,7 +54,7 @@ export function getCurrContextMenu() {
     return curr_context_menu
 }
 
-function createBoard(name, flags) {
+export function createBoard(name, flags) {
     var cmd = [Operation.BOARD_CREATE, name]
     if (flags != null)
         cmd = cmd.concat(flags)
