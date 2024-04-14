@@ -9,6 +9,10 @@ import {setCurrItem} from "./board.js";
 
 var overlayIsActive = false;
 
+export function setOverlayIsActive(value) {
+    overlayIsActive = value
+}
+
 var display_or_not = [
     'div:qr', 'div:back',
     'core', 'lst:chats', 'lst:posts', 'lst:contacts', 'lst:members', 'the:connex',

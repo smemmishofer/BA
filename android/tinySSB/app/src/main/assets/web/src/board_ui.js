@@ -3,7 +3,7 @@
 "use strict";
 
 import {tremola} from "./tremola.js"
-import {closeOverlay} from "./tremola_ui.js";
+import {closeOverlay, setOverlayIsActive} from "./tremola_ui.js";
 import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
 
 const Color = { // all available colors for card title
@@ -291,7 +291,7 @@ function menu_history() {
     closeOverlay()
     document.getElementById('overlay-bg').style.display = 'initial';
     document.getElementById('menu_history_content').innerHTML = ''
-    overlayIsActive = true;
+    setOverlayIsActive(true)
     var board = tremola.board[curr_board]
 
     var reversedHistory = board.history.slice().reverse()
@@ -594,7 +594,7 @@ function context_menu_column_options(columnID) {
     context_menu.innerHTML += "<button class='context_options_btn' onclick='menu_create_column_item(\"" + columnID + "\")'>Add new card</button>"
     // context_menu.innerHTML += "<button class='context_options_btn' onclick='contextmenu_move_column(\"" + columnID + "\")'>Move List...</button>"
     context_menu.innerHTML += "<button class='context_options_btn' onclick='btn_remove_column(\"" + columnID + "\")' style='color:red;'>Delete</button>"
-    overlayIsActive = true
+    setOverlayIsActive(true)
 }
 
 function contextmenu_move_column(columnID) {
@@ -742,7 +742,7 @@ function item_menu(itemID) {
     curr_rename_item = itemID
     curr_item = itemID
     document.getElementById('overlay-bg').style.display = 'initial';
-    overlayIsActive = true;
+    setOverlayIsActive(true)
 
     var item = tremola.board[curr_board].items[itemID]
     document.getElementById('div:item_menu').style.display = 'initial'
@@ -844,7 +844,7 @@ function contextmenu_change_column() {
     setCurrContextMenu('context_options-' + getCurrItem() + "-changeColumn")
     document.getElementById("change_column_options").innerHTML = OptionHTML
     document.getElementById(getCurrContextMenu()).style.display = 'block'
-    overlayIsActive = true
+    setOverlayIsActive(true)
 }
 
 function btn_move_item(item, new_column) {
@@ -885,7 +885,7 @@ function contextmenu_item_change_position() {
     setCurrContextMenu('context_options-' + getCurrItem() + "-changePosition")
     document.getElementById("change_position_options").innerHTML = posHTML
     document.getElementById(getCurrContextMenu()).style.display = 'block'
-    overlayIsActive = true
+    setOverlayIsActive(true)
 }
 
 function contextmenu_item_assign() {
@@ -911,7 +911,7 @@ function contextmenu_item_assign() {
     setCurrContextMenu('context_options-' + getCurrItem() + "-assign")
     document.getElementById("assign_options").innerHTML = assignHTML
     document.getElementById(getCurrContextMenu()).style.display = 'block'
-    overlayIsActive = true
+    setOverlayIsActive(true)
 }
 
 function btn_post_comment() {
@@ -1029,7 +1029,7 @@ function contextmenu_change_color() {
     setCurrContextMenu('context_options-' + getCurrItem() + "-color")
     document.getElementById("change_color_options").innerHTML = colorHTML
     document.getElementById(getCurrContextMenu()).style.display = 'block'
-    overlayIsActive = true
+    setOverlayIsActive(true)
 }
 
 function btn_change_item_color(iid, color) {

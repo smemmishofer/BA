@@ -9,7 +9,8 @@ import {
     curr_scenario,
     onBackPressed,
     btnBridge,
-    showQR, generateQR
+    showQR, generateQR,
+    setOverlayIsActive
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list} from "./board_ui.js";
@@ -71,7 +72,7 @@ function menu_new_contact() {
     document.getElementById('new_contact-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
     // document.getElementById('chat_name').focus();
-    overlayIsActive = true;
+    setOverlayIsActive(true)
 }
 
 function menu_new_pub() {
@@ -101,7 +102,7 @@ function menu_edit(target, title, text) {
     document.getElementById('edit_title').innerHTML = title;
     document.getElementById('edit_text').value = text;
     document.getElementById('edit_text').focus();
-    overlayIsActive = true;
+    setOverlayIsActive(true)
     edit_target = target;
 }
 
@@ -528,7 +529,7 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
     // console.log("load_c_i", JSON.stringify(c[1]))
     bg = c[1].forgotten ? ' gray' : ' light';
     row = "<button class=contact_picture style='margin-right: 0.75em; background: " + c[1].color + ";'>" + c[1].initial + "</button>";
-    row += "<button class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);' onclick='show_contact_details(\"" + c[0] + "\");'>";
+    row += "<button id='show-contact-details' class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + escapeHTML(c[1].alias) + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + c[0] + "</font></div></div></button>";
     // var row  = "<td><button class=contact_picture></button><td style='padding: 5px;'><button class='contact_item_button light w100'>";
@@ -536,6 +537,15 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
     // console.log(row);
     item.innerHTML = row;
     document.getElementById('lst:contacts').appendChild(item);
+    initshowcontactdetails(c)
+}
+
+function initshowcontactdetails(c) {
+    var showcontactdetails = document.getElementById('show-contact-details');
+    // Assign the load_chat function to the onclick event handler of the button
+    showcontactdetails.onclick = function() {
+        show_contact_details("" + c[0] + "");
+    };
 }
 
 function fill_members() {
@@ -577,7 +587,7 @@ function show_contact_details(id) {
     document.getElementById('hide_contact').checked = c.forgotten;
 
     document.getElementById('old_contact_alias').focus();
-    overlayIsActive = true;
+    setOverlayIsActive(true)
 }
 
 function toggle_forget_contact(e) {
@@ -1390,7 +1400,7 @@ function b2f_new_image_blob(ref) {
     s.display = 'initial';
     s.height = '80%'; // 0.8 * docHeight;
     document.getElementById('overlay-bg').style.display = 'initial';
-    overlayIsActive = true;
+    setOverlayIsActive(true)
 }
 
 function b2f_initialize(id) {
