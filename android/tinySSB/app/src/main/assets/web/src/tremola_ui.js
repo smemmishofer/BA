@@ -5,7 +5,7 @@
 import {curr_chat, curr_img_candidate, myId, qr, tremola, escapeHTML, new_text_post, recps2display} from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
-import {curr_item} from "./board.js";
+import {setCurrItem} from "./board.js";
 
 var overlayIsActive = false;
 
@@ -254,7 +254,7 @@ export function closeOverlay() {
     document.getElementById('div:item_menu').style.display = 'none';
     document.getElementById("kanban-invitations-overlay").style.display = 'none';
     document.getElementById('kanban-create-personal-board-overlay').style.display = 'none';
-    curr_item = null
+    setCurrItem(null)
     close_board_context_menu()
     document.getElementById('btn:item_menu_description_save').style.display = 'none'
     document.getElementById('btn:item_menu_description_cancel').style.display = 'none'

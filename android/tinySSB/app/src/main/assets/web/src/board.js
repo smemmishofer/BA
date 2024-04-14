@@ -3,11 +3,12 @@
 "use strict";
 
 import {unicodeStringToTypedArray} from "./tremola.js";
+import {closeOverlay} from "./tremola_ui.js";
 
 var curr_board;
 var curr_context_menu;
 var curr_column;
-export var curr_item;
+var curr_item;
 
 var curr_rename_item;
 
@@ -37,6 +38,21 @@ const FLAG = {
     PERSONAL: 'personal'
 }
 
+export function setCurrItem(value) {
+    curr_item = value
+}
+
+export function getCurrItem() {
+    return curr_item
+}
+
+export function setCurrContextMenu(value){
+    curr_context_menu = value
+}
+
+export function getCurrContextMenu() {
+    return curr_context_menu
+}
 
 function createBoard(name, flags) {
     var cmd = [Operation.BOARD_CREATE, name]

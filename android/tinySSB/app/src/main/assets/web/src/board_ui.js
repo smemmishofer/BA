@@ -4,6 +4,7 @@
 
 import {tremola} from "./tremola.js"
 import {closeOverlay} from "./tremola_ui.js";
+import {setCurrContextMenu, getCurrContextMenu, getCurrItem} from "./board.js";
 
 const Color = { // all available colors for card title
     BLACK: 'black',
@@ -278,12 +279,12 @@ function equalArrays(array1, array2) {
 }
 
 export function close_board_context_menu() {
-    if (curr_context_menu) {
-        var context_menu = document.getElementById(curr_context_menu)
+    if (getCurrContextMenu()) {
+        var context_menu = document.getElementById(getCurrContextMenu())
         if (context_menu)
             context_menu.style.display = 'none';
     }
-    curr_context_menu = null
+    setCurrContextMenu(null)
 }
 
 function menu_history() {
@@ -588,7 +589,7 @@ function context_menu_column_options(columnID) {
     document.getElementById("overlay-trans").style.display = 'initial';
     var context_menu = document.getElementById('context_options-' + columnID)
     context_menu.style.display = 'block'
-    curr_context_menu = 'context_options-' + columnID
+    setCurrContextMenu('context_options-' + columnID)
     context_menu.innerHTML = "<button class='context_options_btn' onclick='menu_rename_column(\"" + columnID + "\")'>Rename list</button>"
     context_menu.innerHTML += "<button class='context_options_btn' onclick='menu_create_column_item(\"" + columnID + "\")'>Add new card</button>"
     // context_menu.innerHTML += "<button class='context_options_btn' onclick='contextmenu_move_column(\"" + columnID + "\")'>Move List...</button>"
@@ -840,9 +841,9 @@ function contextmenu_change_column() {
     }
     OptionHTML += "</div>"
 
-    curr_context_menu = 'context_options-' + curr_item + "-changeColumn"
+    setCurrContextMenu('context_options-' + getCurrItem() + "-changeColumn")
     document.getElementById("change_column_options").innerHTML = OptionHTML
-    document.getElementById(curr_context_menu).style.display = 'block'
+    document.getElementById(getCurrContextMenu()).style.display = 'block'
     overlayIsActive = true
 }
 
@@ -881,9 +882,9 @@ function contextmenu_item_change_position() {
     for (var i in itemPosList) {
         posHTML += "<button class='context_options_btn' onclick='ui_change_item_order(\"" + curr_item + "\",\"" + itemPosList[i][1] + "\")'>" + itemPosList[i][1] + "</button>"
     }
-    curr_context_menu = 'context_options-' + curr_item + "-changePosition"
+    setCurrContextMenu('context_options-' + getCurrItem() + "-changePosition")
     document.getElementById("change_position_options").innerHTML = posHTML
-    document.getElementById(curr_context_menu).style.display = 'block'
+    document.getElementById(getCurrContextMenu()).style.display = 'block'
     overlayIsActive = true
 }
 
@@ -907,9 +908,9 @@ function contextmenu_item_assign() {
 
         assignHTML += "<button class='context_options_btn' style='" + color + "' onclick='ui_item_assign(\"" + fid + "\")'>" + alias + "</button>"
     }
-    curr_context_menu = 'context_options-' + curr_item + "-assign"
+    setCurrContextMenu('context_options-' + getCurrItem() + "-assign")
     document.getElementById("assign_options").innerHTML = assignHTML
-    document.getElementById(curr_context_menu).style.display = 'block'
+    document.getElementById(getCurrContextMenu()).style.display = 'block'
     overlayIsActive = true
 }
 
@@ -1025,9 +1026,9 @@ function contextmenu_change_color() {
         colorHTML += "<button class='context_options_btn' onclick='btn_change_item_color(\"" + curr_item + "\", \"" + c + "\")'>" + c + "</button>"
     }
 
-    curr_context_menu = 'context_options-' + curr_item + "-color"
+    setCurrContextMenu('context_options-' + getCurrItem() + "-color")
     document.getElementById("change_color_options").innerHTML = colorHTML
-    document.getElementById(curr_context_menu).style.display = 'block'
+    document.getElementById(getCurrContextMenu()).style.display = 'block'
     overlayIsActive = true
 }
 
@@ -1071,7 +1072,7 @@ function ui_update_item_color(itemID, new_color) {
         } else {
             item_menu(itemID)
         }
-        if (curr_context_menu && curr_context_menu.split('-')[2] == 'color')
+        if (getCurrContextMenu() && getCurrContextMenu().split('-')[2] == 'color')
             contextmenu_change_color()
     }
 }
@@ -1128,7 +1129,7 @@ function ui_update_item_assignees(itemID) {
         } else {
             item_menu(itemID)
         }
-        if (curr_context_menu && curr_context_menu.split('-')[2] == 'assign') {
+        if (getCurrContextMenu() && getCurrContextMenu().split('-')[2] == 'assign') {
             contextmenu_item_assign()
         }
     }
@@ -1168,10 +1169,10 @@ function ui_update_item_move_to_column(itemID, columnID, newPos) {
     document.getElementById(itemID + '-item').style.order = newPos
 
     if (curr_item == itemID) {
-        if (curr_context_menu) {
-            if (curr_context_menu.split('-')[2] == 'changePosition')
+        if (getCurrContextMenu()) {
+            if (getCurrContextMenu().split('-')[2] == 'changePosition')
                 contextmenu_item_change_position()
-            else if (curr_context_menu.split('-')[2] == 'changeColumn')
+            else if (getCurrContextMenu().split('-')[2] == 'changeColumn')
                 contextmenu_change_column()
         }
     }
