@@ -2,7 +2,17 @@
 
 "use strict";
 
-import {curr_chat, curr_img_candidate, myId, qr, tremola, escapeHTML, new_text_post, recps2display} from "./tremola.js";
+import {
+    curr_chat,
+    curr_img_candidate,
+    myId,
+    qr,
+    tremola,
+    escapeHTML,
+    new_text_post,
+    recps2display,
+    menu_new_contact, backend
+} from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
 import {setCurrItem} from "./board.js";
@@ -96,7 +106,7 @@ export var scenarioMenu = {
         ['Debug', 'ui_debug']]
 }
 
-const QR_SCAN_TARGET = {
+export const QR_SCAN_TARGET = {
     ADD_CONTACT: 0,
     IMPORT_ID: 1
 }
@@ -359,14 +369,14 @@ export function generateQR(s) {
 }
 
 
-function qr_scan_start(target) {
+export function qr_scan_start(target) {
     // test if Android is defined ...
     curr_qr_scan_target = target
     backend("qrscan.init");
     closeOverlay();
 }
 
-function qr_scan_success(s) {
+export function qr_scan_success(s) {
     closeOverlay();
     switch (curr_qr_scan_target) {
         case QR_SCAN_TARGET.ADD_CONTACT:

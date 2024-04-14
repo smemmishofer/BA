@@ -8,8 +8,16 @@ import {
     showPreview2,
     onBackPressed,
     btnBridge,
-    showQR, generateQR,
-    setOverlayIsActive, getCurrScenario, getPrevScenario, setPrevScenario
+    showQR,
+    generateQR,
+    setOverlayIsActive,
+    getCurrScenario,
+    getPrevScenario,
+    setPrevScenario,
+    plus_button,
+    qr_scan_start,
+    QR_SCAN_TARGET,
+    qr_scan_success
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list} from "./board_ui.js";
@@ -67,7 +75,7 @@ function menu_new_conversation() {
     closeOverlay();
 }
 
-function menu_new_contact() {
+export function menu_new_contact() {
     document.getElementById('new_contact-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
     // document.getElementById('chat_name').focus();
@@ -881,6 +889,18 @@ function initializeAllButtons() {
     var savecontentalias = document.getElementById('save-content-alias');
     savecontentalias.onclick = function() {
         save_content_alias();
+    };
+    var plusbutton = document.getElementById('plus-button');
+    plusbutton.onclick = function() {
+        plus_button();
+    };
+    var qrscanstart = document.getElementById('qr-scan-start');
+    qrscanstart.onclick = function() {
+        qr_scan_start(QR_SCAN_TARGET.ADD_CONTACT);
+    };
+    var qrscansuccess = document.getElementById('qr-scan-success');
+    qrscansuccess.onclick = function() {
+        qr_scan_success(document.getElementById('contact_id').value);
     };
 }
 
