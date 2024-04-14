@@ -3,7 +3,7 @@
 "use strict";
 
 import {backend, unicodeStringToTypedArray} from "./tremola.js";
-import {closeOverlay} from "./tremola_ui.js";
+import {closeOverlay, getCurrScenario} from "./tremola_ui.js";
 
 var curr_board;
 var curr_context_menu;
@@ -321,7 +321,7 @@ function kanban_new_event(e) {
 
         //  Ui update + update optimization // board.operations[e.header.ref].indx == board.sortedOperations.length -1
         if (board.sortedOperations.name2p[e.header.ref].indx == board.sortedOperations.linear.length - 1 || independentOPs.indexOf(board.operations[e.header.ref].body.cmd[0]) >= 0) { //if the new event is inserted at the end of the linear timeline or the position is irrelevant for this operation
-            if (curr_scenario == 'board' && curr_board == bid)
+            if (getCurrScenario() == 'board' && curr_board == bid)
                 apply_operation(bid, e.header.ref, true) // the board is currently displayed; additionally perform operation on UI
             else
                 apply_operation(bid, e.header.ref, false)
@@ -333,7 +333,7 @@ function kanban_new_event(e) {
         board.curr_prev = board.sortedOperations.get_tips()
         board.lastUpdate = Date.now()
 
-        if (curr_scenario != 'board' || curr_board != bid)
+        if (getCurrScenario() != 'board' || curr_board != bid)
             board.unreadEvents++
 
         load_board_list()
@@ -347,7 +347,7 @@ function kanban_new_event(e) {
                     console.log("Invited: " + m)
                 }
             }
-            if (curr_scenario == 'members')
+            if (getCurrScenario() == 'members')
                 load_board(bid)
         }
 
@@ -417,7 +417,7 @@ function board_reload(bid) {
     }
     apply_all_operations(bid)
 
-    if (curr_scenario == 'board' && curr_board == bid) {
+    if (getCurrScenario() == 'board' && curr_board == bid) {
         closeOverlay()
         curr_item = null
         curr_column = null
@@ -443,7 +443,7 @@ function apply_all_operations(bid) {
         apply_operation(bid, validOps[i], false)
     }
 
-    if (curr_scenario == 'board' && curr_board == bid) { // update ui
+    if (getCurrScenario() == 'board' && curr_board == bid) { // update ui
         ui_update_board(bid, old_state)
         console.log("UP CURR")
     }

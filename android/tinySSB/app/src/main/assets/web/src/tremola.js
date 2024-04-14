@@ -6,11 +6,10 @@ import {
     closeOverlay,
     setScenario,
     showPreview2,
-    curr_scenario,
     onBackPressed,
     btnBridge,
     showQR, generateQR,
-    setOverlayIsActive
+    setOverlayIsActive, getCurrScenario, getPrevScenario, setPrevScenario
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list} from "./board_ui.js";
@@ -56,7 +55,7 @@ function menu_sync() {
 
 function menu_new_conversation() {
     fill_members();
-    prev_scenario = 'chats';
+    setPrevScenario('chats');
     setScenario("members");
     document.getElementById("div:textarea").style.display = 'none';
     document.getElementById("div:confirm-members").style.display = 'flex';
@@ -91,7 +90,7 @@ function menu_redraw() {
     document.getElementById("lst:contacts").innerHTML = '';
     load_contact_list();
 
-    if (curr_scenario == "posts")
+    if (getCurrScenario() == "posts")
         load_chat(curr_chat);
 }
 
@@ -223,9 +222,9 @@ function edit_confirmed() {
 }
 
 function members_confirmed() {
-    if (prev_scenario == 'chats') {
+    if (getPrevScenario() == 'chats') {
         new_conversation()
-    } else if (prev_scenario == 'kanban') {
+    } else if (getPrevScenario() == 'kanban') {
         menu_new_board_name()
     }
 }
@@ -240,7 +239,7 @@ function menu_forget_conv() {
     persist();
     load_chat_list() // refresh list of conversations
     closeOverlay();
-    if (curr_scenario == 'posts' /* should always be true */ && tremola.chats[curr_chat].forgotten)
+    if (getCurrScenario() == 'posts' /* should always be true */ && tremola.chats[curr_chat].forgotten)
         setScenario('chats');
     else
         load_chat(curr_chat) // refresh currently displayed list of posts
@@ -598,7 +597,7 @@ function toggle_forget_contact(e) {
     load_contact_list();
 }
 
-function save_content_alias() {
+export function save_content_alias() {
     var c = tremola.contacts[new_contact_id];
     var val = document.getElementById('old_contact_alias').value;
     var deleteAlias = false
@@ -824,74 +823,64 @@ function import_id(json_str) {
 
 function initializeAllButtons() {
     var prevbutton = document.getElementById('btn:preview');
-    // Assign the load_chat function to the onclick event handler of the button
     prevbutton.onclick = function() {
         showPreview2();
     };
     var backbutton = document.getElementById('back');
-    // Assign the load_chat function to the onclick event handler of the button
     backbutton.onclick = function() {
         onBackPressed();
     };
     var btnchats = document.getElementById('btn:chats');
-    // Assign the load_chat function to the onclick event handler of the button
     btnchats.onclick = function() {
         btnBridge(this);
     };
     var btnkanban = document.getElementById('btn:kanban');
-    // Assign the load_chat function to the onclick event handler of the button
     btnkanban.onclick = function() {
         btnBridge(this);
     };
     var btncontacts = document.getElementById('btn:contacts');
-    // Assign the load_chat function to the onclick event handler of the button
     btncontacts.onclick = function() {
         btnBridge(this);
     };
     var btnattach = document.getElementById('btn:attach');
-    // Assign the load_chat function to the onclick event handler of the button
     btnattach.onclick = function() {
         btnBridge(this);
     };
     var btnmenu = document.getElementById('btn:menu');
-    // Assign the load_chat function to the onclick event handler of the button
     btnmenu.onclick = function() {
         btnBridge(this);
     };
     var divqr = document.getElementById('btn:qr');
-    // Assign the load_chat function to the onclick event handler of the button
     divqr.onclick = function() {
         showQR();
     };
     var overlaybg = document.getElementById('overlay-bg');
-    // Assign the load_chat function to the onclick event handler of the button
     overlaybg.onclick = function() {
         closeOverlay();
     };
     var overlaytrans = document.getElementById('overlay-trans');
-    // Assign the load_chat function to the onclick event handler of the button
     overlaytrans.onclick = function() {
         closeOverlay();
     };
     var overlaybgcore = document.getElementById('overlay-bg-core');
-    // Assign the load_chat function to the onclick event handler of the button
     overlaybgcore.onclick = function() {
         closeOverlay();
     };
     var overlaytranscore = document.getElementById('overlay-trans-core');
-    // Assign the load_chat function to the onclick event handler of the button
     overlaytranscore.onclick = function() {
         closeOverlay();
     };
     var btncreatepersonalboardaccept = document.getElementById('btn:create_personal_board_accept');
-    // Assign the load_chat function to the onclick event handler of the button
     btncreatepersonalboardaccept.onclick = function() {
         btn_create_personal_board_accept();
     };
     var btncreatepersonalboarddecline = document.getElementById('btn:create_personal_board_decline');
-    // Assign the load_chat function to the onclick event handler of the button
     btncreatepersonalboarddecline.onclick = function() {
         btn_create_personal_board_decline();
+    };
+    var savecontentalias = document.getElementById('save-content-alias');
+    savecontentalias.onclick = function() {
+        save_content_alias();
     };
 }
 
@@ -1326,7 +1315,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 ch["posts"][e.header.ref] = p;
                 if (ch["touched"] < e.header.tst)
                     ch["touched"] = e.header.tst
-                if (curr_scenario == "posts" && curr_chat == conv_name) {
+                if (getCurrScenario() == "posts" && curr_chat == conv_name) {
                     load_chat(conv_name); // reload all messages (not very efficient ...)
                     ch["lastRead"] = Date.now();
                 }
@@ -1334,7 +1323,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
             } else {
                 console.log("known already?")
             }
-            // if (curr_scenario == "chats") // the updated conversation could bubble up
+            //if (getCurrScenario() == "chats") // the updated conversation could bubble up
             load_chat_list();
         } else if (e.public[0] == "KAN") { // Kanban board event
         } else if (e.public[0] == "IAM") {

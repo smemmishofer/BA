@@ -20,8 +20,18 @@ var display_or_not = [
     'div:settings', 'div:board'
 ];
 
-export var prev_scenario = 'chats';
-export var curr_scenario = 'chats';
+var prev_scenario = 'chats';
+export function getPrevScenario() {
+    return prev_scenario
+}
+export function setPrevScenario(value) {
+    prev_scenario = value
+}
+
+var curr_scenario = 'chats';
+export function getCurrScenario() {
+    return curr_scenario
+}
 
 var scenarioDisplay = {
     'chats': ['div:qr', 'core', 'lst:chats', 'div:footer'], // 'plus' TODO reactivate when encrypted chats are implemented

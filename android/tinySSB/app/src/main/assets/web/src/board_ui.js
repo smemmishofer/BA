@@ -3,7 +3,7 @@
 "use strict";
 
 import {tremola} from "./tremola.js"
-import {closeOverlay, setOverlayIsActive} from "./tremola_ui.js";
+import {closeOverlay, setOverlayIsActive, setPrevScenario} from "./tremola_ui.js";
 import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
 
 const Color = { // all available colors for card title
@@ -407,7 +407,7 @@ function btn_invite_decline(bid) {
 function menu_new_board() {
     closeOverlay()
     fill_members();
-    prev_scenario = 'kanban';
+    setPrevScenario('kanban');
     setScenario("members");
 
     document.getElementById("div:textarea").style.display = 'none';
