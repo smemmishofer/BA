@@ -587,7 +587,7 @@ function show_contact_details(id) {
     details += '<br><div>IAM-Alias: &nbsp;' + (c.iam != "" ? c.iam : "&mdash;") + '</div>\n';
     details += '<br><div>Shortname: &nbsp;' + id2b32(id) + '</div>\n';
     details += '<br><div style="word-break: break-all;">SSB identity: &nbsp;<tt>' + id + '</tt></div>\n';
-    details += '<br><div class=settings style="padding: 0px;"><div class=settingsText>Forget this contact</div><div style="float: right;"><label class="switch"><input id="hide_contact" type="checkbox" onchange="toggle_forget_contact(this);"><span class="slider round"></span></label></div></div>'
+    details += '<br><div class=settings style="padding: 0px;"><div class=settingsText>Forget this contact</div><div style="float: right;"><label class="switch"><input id="hide_contact" type="checkbox"><span class="slider round"></span></label></div></div>'
     document.getElementById('old_contact_details').innerHTML = details;
     document.getElementById('old_contact-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
@@ -595,6 +595,11 @@ function show_contact_details(id) {
 
     document.getElementById('old_contact_alias').focus();
     setOverlayIsActive(true)
+    hideContactOnChange(this)
+}
+
+function hideContactOnChange(a) {
+    toggle_forget_contact(a);
 }
 
 function toggle_forget_contact(e) {
