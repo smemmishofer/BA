@@ -11,7 +11,7 @@ import {
     escapeHTML,
     new_text_post,
     recps2display,
-    menu_new_contact, backend, assignMenuOnClick
+    menu_new_contact, backend, assignMenuOnClick, localPeers
 } from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
@@ -215,12 +215,10 @@ export function btnBridge(e) {
         scenarioMenu[curr_scenario].forEach(function (e) {
             m += "<button class=menu_item_button ";
             m += "id='" + e[1] + "'>" + e[0] + "</button><br>";
-            console.log(m)
         })
         m = m.substring(0, m.length - 4);
         // console.log(curr_scenario + ' menu! ' + m);
         document.getElementById("menu").innerHTML = m;
-        console.log('btnBridge ', e)
         assignMenuOnClick()
         return;
     }

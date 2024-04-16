@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {tremola} from "./tremola.js"
+import {fill_members, tremola} from "./tremola.js"
 import {closeOverlay, setOverlayIsActive, setPrevScenario} from "./tremola_ui.js";
 import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
 
@@ -331,7 +331,7 @@ function history_sort_select(obj) {
     }
 }
 
-function menu_board_invitations() {
+export function menu_board_invitations() {
     closeOverlay()
     document.getElementById("kanban-invitations-overlay").style.display = 'initial';
     document.getElementById("overlay-bg").style.display = 'initial';
@@ -404,7 +404,7 @@ function btn_invite_decline(bid) {
         inv.outerHTML = ""
 }
 
-function menu_new_board() {
+export function menu_new_board() {
     closeOverlay()
     fill_members();
     setPrevScenario('kanban');

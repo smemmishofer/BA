@@ -18,10 +18,12 @@ import {
     qr_scan_start,
     QR_SCAN_TARGET,
     qr_scan_success,
-    menu_connection
+    menu_connection,
+    menu_settings,
+    menu_about,
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
-import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list} from "./board_ui.js";
+import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list, menu_new_board, menu_board_invitations} from "./board_ui.js";
 
 // Changes for socket library
 import process from 'socket:process'
@@ -32,7 +34,7 @@ export var tremola;
 export var curr_chat;
 export var qr;
 export var myId;
-var localPeers = {}; // feedID ~ [isOnline, isConnected] - TF, TT, FT - FF means to remove this entry
+export var localPeers = {}; // feedID ~ [isOnline, isConnected] - TF, TT, FT - FF means to remove this entry
 var must_redraw = false;
 var edit_target = '';
 var new_contact_id = '';
@@ -556,7 +558,7 @@ function initshowcontactdetails(c) {
     };
 }
 
-function fill_members() {
+export function fill_members() {
     var choices = '';
     for (var m in tremola.contacts) {
         choices += '<div style="margin-bottom: 10px;"><label><input type="checkbox" id="' + m;
@@ -863,7 +865,6 @@ function initializeAllButtons() {
     var btnmenu = document.getElementById('btn:menu');
     btnmenu.onclick = function() {
         btnBridge(this);
-        assignMenuOnClick(this)
     };
     var divqr = document.getElementById('btn:qr');
     divqr.onclick = function() {
@@ -912,11 +913,12 @@ function initializeAllButtons() {
 }
 
 export function assignMenuOnClick() {
-    console.log('assignMenuOnClick', '')
     const btns = document.querySelectorAll('.menu_item_button')
     btns.forEach(function(btn){
         var button = document.getElementById(btn.id);
-        button.onclick = eval(btn.id + "()");
+        button.onclick = function () {
+            eval(btn.id + "()");
+        }
     })
 }
 
