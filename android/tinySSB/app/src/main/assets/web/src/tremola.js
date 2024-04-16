@@ -17,7 +17,8 @@ import {
     plus_button,
     qr_scan_start,
     QR_SCAN_TARGET,
-    qr_scan_success
+    qr_scan_success,
+    menu_connection
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
 import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list} from "./board_ui.js";
@@ -862,6 +863,7 @@ function initializeAllButtons() {
     var btnmenu = document.getElementById('btn:menu');
     btnmenu.onclick = function() {
         btnBridge(this);
+        assignMenuOnClick(this)
     };
     var divqr = document.getElementById('btn:qr');
     divqr.onclick = function() {
@@ -907,6 +909,15 @@ function initializeAllButtons() {
     qrscansuccess.onclick = function() {
         qr_scan_success(document.getElementById('contact_id').value);
     };
+}
+
+export function assignMenuOnClick() {
+    console.log('assignMenuOnClick', '')
+    const btns = document.querySelectorAll('.menu_item_button')
+    btns.forEach(function(btn){
+        var button = document.getElementById(btn.id);
+        button.onclick = eval(btn.id + "()");
+    })
 }
 
 // --- Interface to Kotlin side and local (browser) storage
