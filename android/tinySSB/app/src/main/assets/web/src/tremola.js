@@ -23,12 +23,20 @@ import {
     menu_about,
 } from "./tremola_ui.js";
 import {setSetting} from "./tremola_settings.js";
-import {btn_create_personal_board_accept, btn_create_personal_board_decline, load_board_list, menu_new_board, menu_board_invitations} from "./board_ui.js";
+import {
+    btn_create_personal_board_accept,
+    btn_create_personal_board_decline,
+    load_board_list,
+    menu_new_board,
+    menu_board_invitations,
+    menu_new_board_name
+} from "./board_ui.js";
 
 // Changes for socket library
 import process from 'socket:process'
 import path from 'socket:path'
 import {Encryption, network} from "socket:network";
+import {createBoard} from "./board.js";
 
 export var tremola;
 export var curr_chat;
@@ -105,7 +113,7 @@ function menu_redraw() {
         load_chat(curr_chat);
 }
 
-function menu_edit(target, title, text) {
+export function menu_edit(target, title, text) {
     closeOverlay()
     document.getElementById('edit-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
@@ -141,7 +149,7 @@ function menu_edit_convname() {
 //   menu_edit('new_contact_alias', "Assign alias to new contact:", "");
 // }
 
-function edit_confirmed() {
+export function edit_confirmed() {
     closeOverlay()
     console.log("edit confirmed: " + edit_target)
     var val = document.getElementById('edit_text').value;
@@ -232,7 +240,7 @@ function edit_confirmed() {
     }
 }
 
-function members_confirmed() {
+export function members_confirmed() {
     if (getPrevScenario() == 'chats') {
         new_conversation()
     } else if (getPrevScenario() == 'kanban') {
@@ -909,6 +917,14 @@ function initializeAllButtons() {
     var qrscansuccess = document.getElementById('qr-scan-success');
     qrscansuccess.onclick = function() {
         qr_scan_success(document.getElementById('contact_id').value);
+    };
+    var membersconfirmed = document.getElementById('members-confirmed');
+    membersconfirmed.onclick = function() {
+        members_confirmed()
+    };
+    var editconfirmed = document.getElementById('edit-confirmed');
+    editconfirmed.onclick = function() {
+        edit_confirmed()
     };
 }
 

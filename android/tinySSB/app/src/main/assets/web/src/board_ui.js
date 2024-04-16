@@ -2,8 +2,8 @@
 
 "use strict";
 
-import {fill_members, tremola} from "./tremola.js"
-import {closeOverlay, setOverlayIsActive, setPrevScenario} from "./tremola_ui.js";
+import {fill_members, menu_edit, tremola} from "./tremola.js"
+import {closeOverlay, setOverlayIsActive, setPrevScenario, setScenario} from "./tremola_ui.js";
 import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
 
 const Color = { // all available colors for card title
@@ -420,7 +420,7 @@ export function menu_new_board() {
 }
 
 
-function menu_new_board_name() {
+export function menu_new_board_name() {
     menu_edit('new_board', 'Enter the name of the new board', '')
 }
 
