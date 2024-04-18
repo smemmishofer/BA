@@ -4,7 +4,7 @@
 
 import {load_chat_list, load_contact_list} from "./tremola.js";
 
-function get_default_settings() {
+export function get_default_settings() {
     return {
         'enable_preview': false,
         'background_map': true,

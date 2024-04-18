@@ -22,7 +22,7 @@ import {
     menu_settings,
     menu_about,
 } from "./tremola_ui.js";
-import {setSetting} from "./tremola_settings.js";
+import {get_default_settings, setSetting} from "./tremola_settings.js";
 import {
     btn_create_personal_board_accept,
     btn_create_personal_board_decline,
@@ -41,6 +41,9 @@ import {createBoard} from "./board.js";
 export var tremola;
 export var curr_chat;
 export var qr;
+export function setQrVar(value) {
+    qr = value
+}
 export var myId;
 export var localPeers = {}; // feedID ~ [isOnline, isConnected] - TF, TT, FT - FF means to remove this entry
 var must_redraw = false;
@@ -954,6 +957,8 @@ async function main () {
     backend('ready')
     await initP2P()
 
+    //clearAllPersistedData()
+
     initializeAllButtons()
 }
 
@@ -1019,6 +1024,7 @@ export function backend(cmdStr) { // send this to Kotlin (or simulate in case of
         var draft = atob(cmdStr[2])
         cmdStr.splice(0, 2)
         console.log("CMD STRING", cmdStr)
+        // TODO: Append to the log
         var e = {
             'header': {
                 'tst': Date.now(),
@@ -1094,9 +1100,15 @@ function resetTremola() { // wipes browser-side content
 }
 
 function persist() {
-    // console.log(tremola);
+    console.log('Data saved persistently');
     window.localStorage.setItem("tremola", JSON.stringify(tremola));
 }
+
+function clearAllPersistedData() {
+    window.localStorage.clear();
+    console.log('All data cleared')
+}
+
 
 /*
 function b2f_local_peer(p, status) { // wireless peer: online, offline, connected, disconnected

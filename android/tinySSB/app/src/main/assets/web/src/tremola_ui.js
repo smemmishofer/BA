@@ -11,11 +11,12 @@ import {
     escapeHTML,
     new_text_post,
     recps2display,
-    menu_new_contact, backend, assignMenuOnClick, localPeers
+    menu_new_contact, backend, assignMenuOnClick, localPeers, setQrVar
 } from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
 import {setCurrItem} from "./board.js";
+import {QRCode} from "./qrcode.js";
 
 var overlayIsActive = false;
 
@@ -43,7 +44,7 @@ export function getCurrScenario() {
     return curr_scenario
 }
 
-var scenarioDisplay = {
+export var scenarioDisplay = {
     'chats': ['div:qr', 'core', 'lst:chats', 'div:footer'], // 'plus' TODO reactivate when encrypted chats are implemented
     'contacts': ['div:qr', 'core', 'lst:contacts', 'div:footer', 'plus'],
     'posts': ['div:back', 'core', 'lst:posts', 'div:textarea'],
@@ -361,7 +362,7 @@ export function generateQR(s) {
             text: s,
             correctLevel: QRCode.CorrectLevel.M // L, M, Q, H
         };
-        qr = new QRCode(e, arg);
+        setQrVar(new QRCode(e, arg))
     } else {
         qr.clear();
         qr.makeCode(s);
