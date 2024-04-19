@@ -958,11 +958,20 @@ async function main () {
     await initP2P()
 
     //clearAllPersistedData()
+    if (process.platform == 'ios') {
+        adjustFormatToIOS()
+    }
 
     initializeAllButtons()
 }
 
 window.addEventListener('DOMContentLoaded', main)
+
+function adjustFormatToIOS() {
+    console.log('Adjusting format to ios')
+
+    // TODO!!!
+}
 
 // Try out socket P2P functionality:
 // (identical code as in 'P2P Guide')
@@ -1102,6 +1111,30 @@ function resetTremola() { // wipes browser-side content
 function persist() {
     console.log('Data saved persistently');
     window.localStorage.setItem("tremola", JSON.stringify(tremola));
+
+    testBipfEncoding()
+}
+
+import { createRequire } from 'socket:module'
+//import {allocAndEncode, decode, seekKey} from "../node_modules/bipf/index.js";
+//const require = createRequire(import.meta.url)
+//require('../node_modules/fast-varint/index.js')
+//require('../node_modules/bipf/index.js')
+
+import bipf from '../node_modules/bipf/index.js'
+//const bipf = require('../node_modules/bipf/index.js')
+
+function testBipfEncoding() {
+    console.log('Encoding & Decoding Buffer')
+
+    //allocate and encode a correctly sized buffer
+    var buffer = bipf.allocAndEncode(tremola)
+
+//parse entire object and read a single value
+    console.log(decode(buffer, 0).id)
+
+//seek and decode a single value
+    console.log(decode(buffer, seekKey(buffer, 0, 'id')))
 }
 
 function clearAllPersistedData() {
