@@ -963,6 +963,8 @@ async function main () {
     }
 
     initializeAllButtons()
+
+    testBipfEncoding()
 }
 
 window.addEventListener('DOMContentLoaded', main)
@@ -1112,10 +1114,10 @@ function persist() {
     console.log('Data saved persistently');
     window.localStorage.setItem("tremola", JSON.stringify(tremola));
 
-    testBipfEncoding()
+    //testBipfEncoding()
 }
 
-import {allocAndEncode, decode, seekKey} from "./bipf";
+import {allocAndEncode, decode, seekKey} from './bipfbundle.js'
 
 function testBipfEncoding() {
     console.log('Encoding & Decoding Buffer')
