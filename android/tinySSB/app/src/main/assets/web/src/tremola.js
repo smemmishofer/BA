@@ -1115,20 +1115,13 @@ function persist() {
     testBipfEncoding()
 }
 
-import { createRequire } from 'socket:module'
-//import {allocAndEncode, decode, seekKey} from "../node_modules/bipf/index.js";
-//const require = createRequire(import.meta.url)
-//require('../node_modules/fast-varint/index.js')
-//require('../node_modules/bipf/index.js')
-
-import bipf from '../node_modules/bipf/index.js'
-//const bipf = require('../node_modules/bipf/index.js')
+import {allocAndEncode, decode, seekKey} from "./bipf";
 
 function testBipfEncoding() {
     console.log('Encoding & Decoding Buffer')
 
     //allocate and encode a correctly sized buffer
-    var buffer = bipf.allocAndEncode(tremola)
+    var buffer = allocAndEncode(tremola)
 
 //parse entire object and read a single value
     console.log(decode(buffer, 0).id)
