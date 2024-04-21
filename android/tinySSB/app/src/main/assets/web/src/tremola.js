@@ -1117,19 +1117,26 @@ function persist() {
     //testBipfEncoding()
 }
 
-import {allocAndEncode, decode, seekKey} from './bipfbundle.js'
+import { createRequire } from 'socket:module'
+//const require = createRequire(import.meta.url)
+//require('./path/to/entry.js')
+
+
+//import {allocAndEncode, decode, seekKey} from './bundled.js'
+import {allocAndEncode, decode, seekKey} from '../node_modules/bipf/index.js'
 
 function testBipfEncoding() {
-    console.log('Encoding & Decoding Buffer')
+    //var bipf = require('./bundled.js'); // Importing using require
+    console.log('Encoding & Decoding Buffer');
 
-    //allocate and encode a correctly sized buffer
-    var buffer = allocAndEncode(tremola)
+    // Allocate and encode a correctly sized buffer
+    var buffer = allocAndEncode(tremola);
 
-//parse entire object and read a single value
-    console.log(decode(buffer, 0).id)
+    // Parse entire object and read a single value
+    console.log(decode(buffer, 0).id);
 
-//seek and decode a single value
-    console.log(decode(buffer, seekKey(buffer, 0, 'id')))
+    // Seek and decode a single value
+    console.log(decode(buffer, seekKey(buffer, 0, 'id')));
 }
 
 function clearAllPersistedData() {
