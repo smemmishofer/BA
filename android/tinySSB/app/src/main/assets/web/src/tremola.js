@@ -32,6 +32,9 @@ import {
     menu_new_board_name
 } from "./board_ui.js";
 
+//import {allocAndEncode, decode, seekKey} from './bundled.js'
+const bipf = import('./bundled.js');
+
 // Changes for socket library
 import process from 'socket:process'
 import path from 'socket:path'
@@ -1114,7 +1117,7 @@ function persist() {
     console.log('Data saved persistently');
     window.localStorage.setItem("tremola", JSON.stringify(tremola));
 
-    //testBipfEncoding()
+    //await testBipfEncoding()
 }
 
 import { createRequire } from 'socket:module'
@@ -1123,14 +1126,15 @@ import { createRequire } from 'socket:module'
 
 
 //import {allocAndEncode, decode, seekKey} from './bundled.js'
-import {allocAndEncode, decode, seekKey} from '../node_modules/bipf/index.js'
 
 function testBipfEncoding() {
-    //var bipf = require('./bundled.js'); // Importing using require
+    //import {allocAndEncode, decode, seekKey} from './bundled.js'
+    //import * as bipf from './bundled.js'
+    //const bipf = import('./bundled.js'); // Importing using require
     console.log('Encoding & Decoding Buffer');
 
     // Allocate and encode a correctly sized buffer
-    var buffer = allocAndEncode(tremola);
+    var buffer = bipf.allocAndEncode(tremola);
 
     // Parse entire object and read a single value
     console.log(decode(buffer, 0).id);

@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "bipf": "npm:bipf",
-    "fast-varint": "npm:fast-varint"
-  }
-}
