@@ -33,7 +33,7 @@ import {
 } from "./board_ui.js";
 
 //import {allocAndEncode, decode, seekKey} from './bundled.js'
-const bipf = import('./bundled.js');
+//const bipf = import('./bundled.js');
 
 // Changes for socket library
 import process from 'socket:process'
@@ -1123,9 +1123,12 @@ function persist() {
 import { createRequire } from 'socket:module'
 //const require = createRequire(import.meta.url)
 //require('./path/to/entry.js')
-
-
 //import {allocAndEncode, decode, seekKey} from './bundled.js'
+
+
+import { decode } from './bipf/decode.js'
+import { allocAndEncode } from "./bipf/encode.js";
+import { seekKey } from "./bipf/seekers.js";
 
 function testBipfEncoding() {
     //import {allocAndEncode, decode, seekKey} from './bundled.js'
@@ -1134,13 +1137,15 @@ function testBipfEncoding() {
     console.log('Encoding & Decoding Buffer');
 
     // Allocate and encode a correctly sized buffer
-    var buffer = bipf.allocAndEncode(tremola);
+    var buffer = allocAndEncode(tremola);
 
     // Parse entire object and read a single value
     console.log(decode(buffer, 0).id);
 
     // Seek and decode a single value
     console.log(decode(buffer, seekKey(buffer, 0, 'id')));
+
+    console.log('Successfully encoded & decoded bipf')
 }
 
 function clearAllPersistedData() {
