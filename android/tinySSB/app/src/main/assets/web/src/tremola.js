@@ -31,6 +31,10 @@ import {
     menu_board_invitations,
     menu_new_board_name
 } from "./board_ui.js";
+import {appendContent, createReplica, fid2replica, listFeeds, loadRepo, readContent,} from "./repo.js";
+import { decode } from './bipf/decode.js'
+import { allocAndEncode, encode } from "./bipf/encode.js";
+import { seekKey } from "./bipf/seekers.js";
 
 //import {allocAndEncode, decode, seekKey} from './bundled.js'
 //const bipf = import('./bundled.js');
@@ -968,7 +972,18 @@ async function main () {
     initializeAllButtons()
 
     testBipfEncoding()
+    bipfTest2()
+
+    //TODO: loadRepo
+    loadRepo()
+        .then(() => console.log('successfully loaded files'))
+        .catch(error => console.log('Error loading Repo'))
+    console.log(listFeeds())
+
+    await createReplica(tremola.id)
 }
+
+function writeContentInFeed() {}
 
 window.addEventListener('DOMContentLoaded', main)
 
@@ -1021,7 +1036,8 @@ function sendP2P(msg) {
     }
 }
 
-export function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
+// ev. Funktion anpassen, ob es async sein soll...
+export async function backend(cmdStr) { // send this to Kotlin (or simulate in case of browser-only testing)
     if (typeof Android != 'undefined') {
         Android.onFrontendRequest(cmdStr);
         return;
@@ -1048,6 +1064,28 @@ export function backend(cmdStr) { // send this to Kotlin (or simulate in case of
             'confid': {},
             'public': ["TAV", atob(cmdStr[0]), null, Date.now()].concat(args)
         }
+        // e zu BIPF konvertieren
+        // e an eigenen append-only-log anhängen
+
+        // letzten Eintrag vom Log gleich wieder lesen aus der Datei
+        // Kriegen Byte-Array zurück; daraus gleich wieder lesen/ bezw. von BIPF zurück konvertieren.
+
+        //var b = allocAndEncode(d1)
+        //var d2 = decode(b)
+        var ebipf = allocAndEncode(e)
+        var r = await fid2replica(tremola.id)
+        await appendContent(r, ebipf)
+
+        /*const read_e = await readContent(r, 0)
+        console.log(read_e)
+        console.log(decode(read_e, 0))*/
+        //TODO: Continue here/ Fix this
+        readContent(r, 0).then(read_e => {
+            console.log(read_e)
+            console.log(decode(read_e, 0))
+        })
+
+        // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
@@ -1125,11 +1163,6 @@ import { createRequire } from 'socket:module'
 //require('./path/to/entry.js')
 //import {allocAndEncode, decode, seekKey} from './bundled.js'
 
-
-import { decode } from './bipf/decode.js'
-import { allocAndEncode } from "./bipf/encode.js";
-import { seekKey } from "./bipf/seekers.js";
-
 function testBipfEncoding() {
     //import {allocAndEncode, decode, seekKey} from './bundled.js'
     //import * as bipf from './bundled.js'
@@ -1146,6 +1179,22 @@ function testBipfEncoding() {
     console.log(decode(buffer, seekKey(buffer, 0, 'id')));
 
     console.log('Successfully encoded & decoded bipf')
+}
+
+function bipfTest2() {
+    var jobject = {
+        "n": 1,
+        "b": true,
+        "s": "strg",
+        "z": null
+    }
+    var j = '{"n":1, "b":true, "s":"strg", "z":null, "d":[1, null]}';
+    var d1 = JSON.parse(j)
+
+    var b = allocAndEncode(d1)
+    var d2 = decode(b)
+
+    console.log(JSON.stringify(d2))
 }
 
 function clearAllPersistedData() {
