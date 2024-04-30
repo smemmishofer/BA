@@ -1074,16 +1074,25 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         //var d2 = decode(b)
         var ebipf = allocAndEncode(e)
         var r = await fid2replica(tremola.id)
+        console.log(r)
         await appendContent(r, ebipf)
+        console.log(r)
 
         /*const read_e = await readContent(r, 0)
         console.log(read_e)
         console.log(decode(read_e, 0))*/
         //TODO: Continue here/ Fix this
-        readContent(r, 0).then(read_e => {
-            console.log(read_e)
-            console.log(decode(read_e, 0))
-        })
+        const read_e = await readContent(r, 1);
+        console.log('read content: ', read_e);
+        console.log('decoded content: ', decode(read_e, 0));
+
+        console.log('Break for visibility:')
+        console.log('\n')
+        console.log('\n')
+        console.log('\n')
+        console.log('\n')
+        console.log('\n')
+        console.log('\n')
 
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         b2f_new_event(e)

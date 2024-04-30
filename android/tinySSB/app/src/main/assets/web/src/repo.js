@@ -112,6 +112,7 @@ export async function appendContent(r, c) {
     await fs.writeFile(filePath, combinedContent);
     // Append content to the local replica variable
     r.logEntries.push(c);
+    console.log('content to append: ', combinedContent)
     console.log('Content appended successfully.');
   } catch (err) {
     console.log('File Path: ', filePath)
