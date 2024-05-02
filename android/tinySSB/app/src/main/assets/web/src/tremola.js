@@ -31,7 +31,7 @@ import {
     menu_board_invitations,
     menu_new_board_name
 } from "./board_ui.js";
-import {appendContent, createReplica, fid2replica, listFeeds, loadRepo, readContent,} from "./repo.js";
+import {appendContent, createReplica, fid2replica, listFeeds, loadRepo, readAllContent, readContent,} from "./repo.js";
 import { decode } from './bipf/decode.js'
 import { allocAndEncode, encode } from "./bipf/encode.js";
 import { seekKey } from "./bipf/seekers.js";
@@ -980,7 +980,7 @@ async function main () {
         .catch(error => console.log('Error loading Repo'))
     console.log(listFeeds())
 
-    await createReplica(tremola.id)
+    await fid2replica(tremola.id)
 }
 
 function writeContentInFeed() {}
@@ -1026,6 +1026,17 @@ async function initP2P() {
         console.error(err)
     }
 }
+
+/*
+v für want-Vektor
+Idee: von jedem Feed sagen, diese FeedID und diese seqNr habe ich
+
+Zuerst noch als BIPF konvertieren
+bipf(['v', {fid:seqNr}])
+
+Als Antwort: entry schicken, mit allen Angaben.
+bipf(['e', fid, seqNr, data])
+ */
 
 function sendP2P(msg) {
     try {
@@ -1082,7 +1093,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         console.log(read_e)
         console.log(decode(read_e, 0))*/
         //TODO: Continue here/ Fix this
-        const read_e = await readContent(r, 1);
+        const read_e = await readContent(r, r.logEntries.length -1);
         console.log('read content: ', read_e);
         console.log('decoded content: ', decode(read_e, 0));
 
@@ -1094,8 +1105,11 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         console.log('\n')
         console.log('\n')
 
+        console.log(decode(readAllContent()))
+
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
-        b2f_new_event(e)
+        //TODO: hier wieder einkommentieren!!
+        //b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
@@ -1125,7 +1139,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         }
         // console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
-        console.log(e)
+        //console.log(e)
     } else {
         // console.log('backend', JSON.stringify(cmdStr))
     }

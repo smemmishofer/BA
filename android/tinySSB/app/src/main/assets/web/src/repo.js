@@ -1,7 +1,9 @@
 import fs from 'socket:fs/promises'
 import path from 'socket:path'
+import { decode } from './bipf/decode.js'
 
 const fidlist = [];
+const replicas = {};
 const repoPath = path.join(path.DOCUMENTS, './repo/')
 // --> Use Path.DOCUMENTS; it is more predictable where the files get saved
 // --> May change later, if necessary
@@ -56,7 +58,7 @@ export async function createReplica(fid) {
       // continue
     }
     // Write an empty file (you can later write binary data to it)
-    await fs.writeFile(path.join(repoPath, `/${fid}.log`), '');
+    await fs.writeFile(path.join(repoPath, `/${fid}.log`), new Uint8Array(0));
     console.log('File created successfully:', path.join(repoPath, `/${fid}.log`));
   } catch (err) {
     console.error('Error creating file: ', err)
@@ -71,26 +73,41 @@ export async function fid2replica(fid) {
     // Müsste die Datei mit fid ... lesen und davon alle Log-Einträge holen.
     // Z.b. FeedID aaaaa...
     // Log-Einträge werden in BIPF-Format gespeichert.
-  try {
-    const replica = {
-      name: fid, // Setting the name of the replica as the FeedID
-      logEntries: [] // Initializing an empty array to store log entries
-    };
-    const fileContent = await fs.readFile(path.join(repoPath, `/${fid}.log`));
-    // check first, if file already has content, and if it's a string.
-    const trimmedContent = (typeof fileContent === 'string') ? fileContent.trim() : '';
-    // Maybe choose different separator for log Entries...
-    const logEntries = trimmedContent.split('\n');
-    replica.logEntries = logEntries;
-    return replica;
-  } catch (err) {
-    console.error('Error reading log file:', err);
-    return null;
+  if (fid in replicas) {
+    return replicas[fid]
+  } else {
+    try {
+      const replica = {
+        name: fid, // Setting the name of the replica as the FeedID
+        logEntries: [] // Initializing an empty array to store log entries
+      };
+      var filePath = path.join(repoPath, `/${fid}.log`)
+      var fhandle = await fs.open(filePath, 'r');
+      var buf = new ArrayBuffer(100000)
+      var count;
+      await count = fhandle.read(buf)
+      await fhandle.close()
+
+      var pos = 0
+      do {
+        var data = decode(buf, pos)
+        replica.logEntries.push(buf.splice(pos, pos + decode.bytes))
+        pos += decode.bytes
+      } while (pos < buf.byteLength)
+      // check first, if file already has content, and if it's a string.
+      // Maybe choose different separator for log Entries...
+      replicas[fid] = replica
+      return replica;
+    } catch (err) {
+      console.error('Error reading log file:', err);
+      return null;
+    }
   }
 }
 
 export async function appendContent(r, c) {
   // c ist ein Byte-Array (ist bereits in BIPF-Format konvertiert)
+  //let cString = btoa(c)
 
   // Hängt am Schluss der Replika-Datei den Content c an
   // Und zusätzlich noch an lokaler Variable r (Liste) anhängen
@@ -98,9 +115,9 @@ export async function appendContent(r, c) {
     const filePath = path.join(repoPath, `/${r.name}.log`);
     // ${r.name}.log
     // Read existing content from the file
-    let existingContent = '';
+    let fhandle;
     try {
-      existingContent = await fs.readFile(filePath);
+      fhandle = await fs.open(filePath, 'a');
     } catch (readError) {
       // File might not exist yet, ignore the error
     }
@@ -108,14 +125,14 @@ export async function appendContent(r, c) {
     // existingContent ? '\n' : ''
     // this part ensures that we only add a newline, if there is already existing content
     // we add a newline, because above in the fid2replica method we split the log entries at '\n'
-    const combinedContent = existingContent + (existingContent ? '\n' : '') + c;
-    await fs.writeFile(filePath, combinedContent);
+    await fhandle.write(c)
+    await fhandle.close()
     // Append content to the local replica variable
-    r.logEntries.push(c);
-    console.log('content to append: ', combinedContent)
+    console.log('r before pushing: ', r)
+    r.logEntries.push(c)
     console.log('Content appended successfully.');
   } catch (err) {
-    console.log('File Path: ', filePath)
+    console.log('File Path: ', path.join(repoPath, `/${r.name}.log`))
     console.error('Error appending content: ', err)
   }
 }
@@ -134,6 +151,13 @@ export function readContent(r, i) {
   }
 }
 // Nach Aufruf dieser Funktion die erhaltenen bipf-Bytes decodieren
+
+export function readAllContent(r) {
+  // Nimmt Replika-Objekt von oben entgegen
+  // Da R-Objekt eine Liste von Log-Einträgen ist:
+  // i-tes Element dieser Liste zurückgeben
+  return r.logEntries
+}
 
 // Format: 1 File pro Feed (Komplikation mit mid-Feld)
 // Keine Crash-Resistenz
