@@ -980,6 +980,7 @@ async function main () {
         .catch(error => console.log('Error loading Repo'))
     console.log(listFeeds())
 
+    await createReplica(tremola.id)
     await fid2replica(tremola.id)
 }
 
@@ -1099,17 +1100,21 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
 
         console.log('Break for visibility:')
         console.log('\n')
-        console.log('\n')
-        console.log('\n')
-        console.log('\n')
-        console.log('\n')
-        console.log('\n')
 
-        //console.log(decode(readAllContent()))
+        console.log(r)
+
+        for (let entry in r.logEntries) {
+            console.log('not decoded content: ', entry);
+        }
+        for (let index in r.logEntries) {
+            if (r.logEntries[index]) {
+                console.log('decoded content: ', decode(r.logEntries[index], 0));
+            }
+        }
 
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         //TODO: hier wieder einkommentieren!!
-        b2f_new_event(e)
+        //b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]

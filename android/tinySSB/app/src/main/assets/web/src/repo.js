@@ -58,7 +58,9 @@ export async function createReplica(fid) {
       // continue
     }
     // Write an empty file (you can later write binary data to it)
-    await fs.writeFile(path.join(repoPath, `/${fid}.log`), new Uint8Array(0));
+    var filePath = path.join(repoPath, `/${fid}.log`)
+    var fhandle = await fs.open(filePath, 'a');
+    await fhandle.close()
     console.log('File created successfully:', path.join(repoPath, `/${fid}.log`));
   } catch (err) {
     console.error('Error creating file: ', err)
@@ -87,12 +89,18 @@ export async function fid2replica(fid) {
       var {byteCount, buffer} = await fhandle.read(buf)
       await fhandle.close()
 
-      var pos = 0
-      do {
-        //var data = decode(buf, pos)
-        replica.logEntries.push(buf.slice(pos, pos + decode.bytes))
-        pos += decode.bytes
-      } while (pos < byteCount)
+      if(byteCount > 0) {
+        var pos = 0
+        do {
+          //var data = decode(buf, pos)
+          replica.logEntries.push(buf.slice(pos, pos + decode.bytes))
+          console.log('pushed content: ', buf.slice(pos, pos + decode.bytes))
+          pos += decode.bytes
+        } while (pos < byteCount)
+      } else {
+        console.log('Buffer length is 0')
+      }
+
       // check first, if file already has content, and if it's a string.
       // Maybe choose different separator for log Entries...
       replicas[fid] = replica
@@ -117,19 +125,27 @@ export async function appendContent(r, c) {
     let fhandle;
     try {
       fhandle = await fs.open(filePath, 'a');
-    } catch (readError) {
+    } catch (openError) {
+      console.error('Error opening file for appending:', openError);
       // File might not exist yet, ignore the error
     }
     // Combine existing content with the new content
     // existingContent ? '\n' : ''
     // this part ensures that we only add a newline, if there is already existing content
     // we add a newline, because above in the fid2replica method we split the log entries at '\n'
-    await fhandle.write(c)
-    await fhandle.close()
-    // Append content to the local replica variable
-    console.log('r before pushing: ', r)
-    r.logEntries.push(c)
-    console.log('Content appended successfully.');
+    if (fhandle) {
+      // Write content to the file
+      console.log(c)
+      await fhandle.appendFile(c);
+      console.log('closing...')
+      await fhandle.close();
+      // Append content to the local replica variable
+      r.logEntries.push(c);
+      console.log('Content appended successfully.');
+    } else {
+      // Handle the case where the file handle is undefined
+      console.error('File handle is undefined. Unable to append content.');
+    }
   } catch (err) {
     console.log('File Path: ', path.join(repoPath, `/${r.name}.log`))
     console.error('Error appending content: ', err)
