@@ -1105,11 +1105,11 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         console.log('\n')
         console.log('\n')
 
-        console.log(decode(readAllContent()))
+        //console.log(decode(readAllContent()))
 
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         //TODO: hier wieder einkommentieren!!
-        //b2f_new_event(e)
+        b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
@@ -1177,7 +1177,7 @@ function resetTremola() { // wipes browser-side content
 function persist() {
     console.log('Data saved persistently');
     window.localStorage.setItem("tremola", JSON.stringify(tremola));
-
+    //window.localStorage.removeItem("tremola");
     //await testBipfEncoding()
 }
 

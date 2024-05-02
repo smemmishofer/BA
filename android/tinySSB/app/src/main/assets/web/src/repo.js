@@ -84,16 +84,15 @@ export async function fid2replica(fid) {
       var filePath = path.join(repoPath, `/${fid}.log`)
       var fhandle = await fs.open(filePath, 'r');
       var buf = new ArrayBuffer(100000)
-      var count;
-      await count = fhandle.read(buf)
+      var {byteCount, buffer} = await fhandle.read(buf)
       await fhandle.close()
 
       var pos = 0
       do {
-        var data = decode(buf, pos)
-        replica.logEntries.push(buf.splice(pos, pos + decode.bytes))
+        //var data = decode(buf, pos)
+        replica.logEntries.push(buf.slice(pos, pos + decode.bytes))
         pos += decode.bytes
-      } while (pos < buf.byteLength)
+      } while (pos < byteCount)
       // check first, if file already has content, and if it's a string.
       // Maybe choose different separator for log Entries...
       replicas[fid] = replica
