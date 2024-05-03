@@ -134,10 +134,8 @@ export async function appendContent(r, c) {
   try {
     fileHandle = await fs.open(filePath, 'a')
 
-    console.log('before appending: ', decode(await fs.readFile(filePath)))
-    console.log('file handle: ', fileHandle)
-    await fileHandle.appendFile(filePath, c)
-    console.log('after appending: ', decode(await fs.readFile(filePath)))
+    //await fileHandle.appendFile(filePath, c)
+    await fileHandle.write(c, 0, c.length, -1)
 
     r.logEntries.push(c);
   } finally {
@@ -145,6 +143,21 @@ export async function appendContent(r, c) {
       await fileHandle.close()
     }
   }
+
+  /*try {
+    fileHandle = await fs.open(filePath, 'a')
+
+    //console.log('before appending: ', decode(await fs.readFile(filePath)))
+    console.log('file handle: ', fileHandle)
+    await fileHandle.appendFile(c)
+    //console.log('after appending: ', decode(await fs.readFile(filePath)))
+
+    r.logEntries.push(c);
+  } finally {
+    if (fileHandle) {
+      await fileHandle.close()
+    }
+  }*/
 
   const newBuffer = await fs.readFile(filePath)
   console.log('New content: ', newBuffer)
