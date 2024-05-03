@@ -960,7 +960,7 @@ if (process.platform === 'mac') {
 
 async function main () {
     console.log('Current Platform: ', process.platform)
-    console.log('Documents Path: ', path.DOCUMENTS)
+    //console.log('Documents Path: ', path.DOCUMENTS)
     backend('ready')
     await initP2P()
 
@@ -971,8 +971,8 @@ async function main () {
 
     initializeAllButtons()
 
-    testBipfEncoding()
-    bipfTest2()
+    //testBipfEncoding()
+    //bipfTest2()
 
     //TODO: loadRepo
     loadRepo()
@@ -1086,15 +1086,17 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         //var d2 = decode(b)
         var ebipf = allocAndEncode(e)
         var r = await fid2replica(tremola.id)
-        console.log(r)
+
+        //console.log('Before appending: ', r)
         await appendContent(r, ebipf)
-        console.log(r)
+        //console.log('After appending: ', r)
 
         /*const read_e = await readContent(r, 0)
         console.log(read_e)
         console.log(decode(read_e, 0))*/
         //TODO: Continue here/ Fix this
         const read_e = await readContent(r, r.logEntries.length -1);
+        //const read_e = await readContent(r, 0);
         console.log('read content: ', read_e);
         console.log('decoded content: ', decode(read_e, 0));
 
