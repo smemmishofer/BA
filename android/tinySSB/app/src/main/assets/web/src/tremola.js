@@ -22,7 +22,7 @@ import {
     menu_settings,
     menu_about,
 } from "./tremola_ui.js";
-import {get_default_settings, setSetting} from "./tremola_settings.js";
+import {get_default_settings, setSetting, toggle_changed} from "./tremola_settings.js";
 import {
     btn_create_personal_board_accept,
     btn_create_personal_board_decline,
@@ -561,26 +561,35 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
         c[1]["color"] = colors[Math.floor(colors.length * Math.random())];
         persist();
     }
+    var strid = `show-contact-details${c[0]}`
     // console.log("load_c_i", JSON.stringify(c[1]))
     bg = c[1].forgotten ? ' gray' : ' light';
     row = "<button class=contact_picture style='margin-right: 0.75em; background: " + c[1].color + ";'>" + c[1].initial + "</button>";
-    row += "<button id='show-contact-details' class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);'>";
+    row += "<button id='" + strid + "' class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + escapeHTML(c[1].alias) + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + c[0] + "</font></div></div></button>";
     // var row  = "<td><button class=contact_picture></button><td style='padding: 5px;'><button class='contact_item_button light w100'>";
     // row += escapeHTML(c[1].alias) + "<br><font size=-2>" + c[0] + "</font></button>";
     // console.log(row);
+
+    //var btn = document.getElementById('show-contact-details')
+    //btn.setAttribute('id', strid)
+
     item.innerHTML = row;
     document.getElementById('lst:contacts').appendChild(item);
+    console.log('before initshowcontactdetails: ', c)
     initshowcontactdetails(c)
 }
 
 function initshowcontactdetails(c) {
-    var showcontactdetails = document.getElementById('show-contact-details');
+    console.log(c)
+    var strid = `show-contact-details${c[0]}`
+    var showcontactdetails = document.getElementById(strid);
     // Assign the load_chat function to the onclick event handler of the button
     showcontactdetails.onclick = function() {
         show_contact_details("" + c[0] + "");
     };
+    console.log('Assigned onclick to:',c[0])
 }
 
 export function fill_members() {
@@ -603,6 +612,13 @@ export function fill_members() {
 }
 
 function show_contact_details(id) {
+    console.log('show_contact_details function: ', id)
+
+    for (var contact in tremola.contacts) {
+        console.log('contact:', contact)
+        console.log(tremola.contacts[contact].forgotten)
+    }
+
     if (id == myId) {
         document.getElementById('old_contact_alias_hdr').innerHTML = "Alias: (own name, visible to others)"
     } else {
@@ -623,7 +639,8 @@ function show_contact_details(id) {
 
     document.getElementById('old_contact_alias').focus();
     setOverlayIsActive(true)
-    hideContactOnChange(this)
+    //TODO: Maybe de-comment this again later...
+    //hideContactOnChange(this)
 }
 
 function hideContactOnChange(a) {
@@ -955,6 +972,42 @@ function initializeAllButtons() {
     settingsurlInput.onkeypress = function () {
         onEnter(event)
     }
+    var ble = document.getElementById('ble');
+    ble.onchange = function () {
+        toggle_changed(this)
+    }
+    var udp_multicast = document.getElementById('udp_multicast');
+    udp_multicast.onchange = function () {
+        toggle_changed(this)
+    }
+    var websocket = document.getElementById('websocket');
+    websocket.onchange = function () {
+        toggle_changed(this)
+    }
+    var enable_preview = document.getElementById('enable_preview');
+    enable_preview.onchange = function () {
+        toggle_changed(this)
+    }
+    var hide_forgotten_contacts = document.getElementById('hide_forgotten_contacts');
+    hide_forgotten_contacts.onchange = function () {
+        toggle_changed(this)
+    }
+    var hide_forgotten_boards = document.getElementById('hide_forgotten_boards');
+    hide_forgotten_boards.onchange = function () {
+        toggle_changed(this)
+    }
+    var hide_forgotten_conv = document.getElementById('hide_forgotten_conv');
+    hide_forgotten_conv.onchange = function () {
+        toggle_changed(this)
+    }
+    var show_shortnames = document.getElementById('show_shortnames');
+    show_shortnames.onchange = function () {
+        toggle_changed(this)
+    }
+    var background_map = document.getElementById('background_map');
+    background_map.onchange = function () {
+        toggle_changed(this)
+    }
 }
 
 export function assignMenuOnClick() {
@@ -994,6 +1047,15 @@ async function main () {
 
     //testBipfEncoding()
     //bipfTest2()
+
+    for (var contact in tremola.contacts) {
+        console.log('contact:', contact)
+        console.log(tremola.contacts[contact])
+        //load_contact_item([contact, tremola.contacts[contact]]);
+        //initshowcontactdetails([contact, tremola.contacts[contact]])
+        tremola.contacts[contact].forgotten = false
+    }
+    menu_redraw()
 
     //TODO: loadRepo
     loadRepo()
@@ -1193,7 +1255,7 @@ function resetTremola() { // wipes browser-side content
     persist();
 }
 
-function persist() {
+export function persist() {
     console.log('Data saved persistently');
     window.localStorage.setItem("tremola", JSON.stringify(tremola));
     //window.localStorage.removeItem("tremola");

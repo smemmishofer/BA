@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {load_chat_list, load_contact_list} from "./tremola.js";
+import {tremola, backend, persist, load_chat_list, load_contact_list} from "./tremola.js";
 
 export function get_default_settings() {
     return {
@@ -18,7 +18,7 @@ export function get_default_settings() {
     }
 }
 
-function toggle_changed(e) {
+export function toggle_changed(e) {
     // console.log("toggle ", e.id);
     tremola.settings[e.id] = e.checked;
     backend("settings:set " + e.id + " " + e.checked)
