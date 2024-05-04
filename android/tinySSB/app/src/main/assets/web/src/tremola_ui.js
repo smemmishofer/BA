@@ -11,7 +11,7 @@ import {
     escapeHTML,
     new_text_post,
     recps2display,
-    menu_new_contact, backend, assignMenuOnClick, localPeers, setQrVar
+    menu_new_contact, backend, assignMenuOnClick, localPeers, setQrVar, setNewContactID, getNewContactID
 } from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
@@ -396,9 +396,9 @@ export function qr_scan_success(s) {
                 launch_snackbar("unknown format or invalid identity");
                 return;
             }
-            new_contact_id = s;
+            setNewContactID(s)
             // console.log("tremola:", tremola)
-            if (new_contact_id in tremola.contacts) {
+            if (getNewContactID() in tremola.contacts) {
                 launch_snackbar("This contact already exists");
                 return;
             }

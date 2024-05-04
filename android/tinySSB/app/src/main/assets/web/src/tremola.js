@@ -65,6 +65,13 @@ var wants = {}
 
 var restream = false // whether the backend is currently restreaming all posts
 
+export function getNewContactID() {
+    return new_contact_id
+}
+export function setNewContactID(value) {
+    new_contact_id = value
+}
+
 // --- menu callbacks
 
 /*
@@ -959,6 +966,8 @@ if (process.platform === 'mac') {
 }
 
 async function main () {
+    //window.localStorage.removeItem("tremola");
+
     console.log('Current Platform: ', process.platform)
     //console.log('Documents Path: ', path.DOCUMENTS)
     backend('ready')
@@ -1107,7 +1116,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
 
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         //TODO: hier wieder einkommentieren!!
-        //b2f_new_event(e)
+        b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
@@ -1446,9 +1455,9 @@ function b2f_new_incomplete_event(e) {
  */
 function b2f_new_event(e) { // incoming SSB log event: we get map with three entries
                             // console.log('hdr', JSON.stringify(e.header))
-    console.log('pub', JSON.stringify(e.public))
+    // console.log('pub', JSON.stringify(e.public))
     // console.log('cfd', JSON.stringify(e.confid))
-    console.log("New Frontend Event: " + JSON.stringify(e.header))
+    // console.log("New Frontend Event: " + JSON.stringify(e.header))
 
     //add
     if (!(e.header.fid in tremola.contacts)) {
