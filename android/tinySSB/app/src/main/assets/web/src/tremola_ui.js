@@ -11,7 +11,7 @@ import {
     escapeHTML,
     new_text_post,
     recps2display,
-    menu_new_contact, backend, assignMenuOnClick, localPeers, setQrVar, setNewContactID, getNewContactID
+    menu_new_contact, backend, assignMenuOnClick, localPeers, setQrVar, setNewContactID, getNewContactID, menu_edit
 } from "./tremola.js";
 import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";

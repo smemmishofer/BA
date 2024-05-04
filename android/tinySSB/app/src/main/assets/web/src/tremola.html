@@ -324,7 +324,7 @@
 
   <div id='edit-overlay' class='qr-overlay'>
     <div id="edit_title" style='margin-bottom: 25px;'>Edit X:</div>
-    <input type="text" id="edit_text" onkeypress="onEnter(event)" minlength="1" size="64" style="width: calc(100% - 10px); height: 30px;">&nbsp;
+    <input type="text" id="edit_text" minlength="1" size="64" style="width: calc(100% - 10px); height: 30px;">&nbsp;
     <div style='text-align: right;'><button id="edit-confirmed" class="passive buttontext" style="background-image: url('img/checked.svg'); margin-right: 5px; border: 0pt; height: 30px; width: 30px;">&nbsp;</button></div>
   </div>
 
@@ -336,7 +336,7 @@
     <div style='display: flex; justify-content: center;'><button class="passive buttontext" onclick="qr_scan_start(QR_SCAN_TARGET.IMPORT_ID);" style="border: 0pt; height: 60pt; width: 120px; background-image: url('img/qr-code-scan.svg');margin: auto;">&nbsp;</button></div>
     <br>
     <div style='text-align: center; margin-left: 10px; margin-right: 10px;margin-bottom: 15px;'><b>Import via copied secret key</b></div>
-    <textarea placeholder='{"curve": "ed25519", "secret": "YOUR SECRECT KEY"}' id="import-id-input" rows="3" onkeypress="onEnter(event)"></textarea>
+    <textarea placeholder='{"curve": "ed25519", "secret": "YOUR SECRECT KEY"}' id="import-id-input" rows="3"></textarea>
     <button class="passive buttontext" style="background-image: url('img/checked.svg');border: 0pt; height: 40px; width: 40px;" onclick="btn_import_id()" ></button>
     <div></div>
   </div>
@@ -462,7 +462,7 @@
     </div>
     <div id="container:settings_ws_url" class="websocket_url_settings" style="display:none;">
       <div class="settingsText" style="margin-right: 10px;font-size: 16px;margin-bottom: 5px;">URL: </div>
-      <input type="text" id="settings_urlInput" onkeypress="onEnter(event)" placeholder="Websocket-Url (ws://...)" required style="height:30px; width: 70%">
+      <input type="text" id="settings_urlInput" placeholder="Websocket-Url (ws://...)" required style="height:30px; width: 70%">
       <button id="btn:url" class ="flat passive buttontext" onclick="btn_setWebsocketUrl()" style="background-image: url('img/checked.svg'); width:35px; height:35px; margin-left: 5px;"></button>
     </div>
     <hr>

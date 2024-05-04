@@ -141,7 +141,7 @@ export function menu_edit(target, title, text) {
     edit_target = target;
 }
 
-function onEnter(ev) {
+export function onEnter(ev) {
 
     if (ev.key == "Enter") {
         switch(ev.target.id) {
@@ -943,6 +943,18 @@ function initializeAllButtons() {
     editconfirmed.onclick = function() {
         edit_confirmed()
     };
+    var edittext = document.getElementById('edit_text');
+    edittext.onkeypress = function () {
+        onEnter(event)
+    }
+    var importidinput = document.getElementById('import-id-input');
+    importidinput.onkeypress = function () {
+        onEnter(event)
+    }
+    var settingsurlInput = document.getElementById('settings_urlInput');
+    settingsurlInput.onkeypress = function () {
+        onEnter(event)
+    }
 }
 
 export function assignMenuOnClick() {
