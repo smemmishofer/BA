@@ -84,16 +84,10 @@ export async function fid2replica(fid) {
         logEntries: [] // Initializing an empty array to store log entries
       };
       var filePath = path.join(repoPath, `/${fid}.log`)
-      //var fhandle = await fs.open(filePath, 'r');
       var buf = new ArrayBuffer(100000)
-      //var {byteCount, buffer} = await fhandle.read(buf)
 
       buf = await fs.readFile(filePath)
 
-      console.log('byteCount:', buf.byteLength);
-      console.log('buffer:', buf);
-
-      //await fhandle.close()
       var byteCount = buf.byteLength
 
       if(byteCount > 0) {
@@ -101,7 +95,7 @@ export async function fid2replica(fid) {
         do {
           var data = decode(buf, pos)
           replica.logEntries.push(buf.slice(pos, pos + decode.bytes))
-          console.log('pushed content: ', buf.slice(pos, pos + decode.bytes))
+          //console.log('pushed content: ', buf.slice(pos, pos + decode.bytes))
           pos += decode.bytes
         } while (pos < byteCount)
       } else {
@@ -126,8 +120,8 @@ export async function appendContent(r, c) {
 
   const filePath = path.join(repoPath, `/${r.name}.log`)
 
-  const oldBuffer = await fs.readFile(filePath)
-  console.log('Old content: ', oldBuffer)
+  //const oldBuffer = await fs.readFile(filePath)
+  //console.log('Old content: ', oldBuffer)
 
   let fileHandle = null
 
@@ -159,44 +153,8 @@ export async function appendContent(r, c) {
     }
   }*/
 
-  const newBuffer = await fs.readFile(filePath)
-  console.log('New content: ', newBuffer)
-
-
-  // Hängt am Schluss der Replika-Datei den Content c an
-  // Und zusätzlich noch an lokaler Variable r (Liste) anhängen
-  /*try {
-    const filePath = path.join(repoPath, `/${r.name}.log`);
-    // ${r.name}.log
-    // Read existing content from the file
-    let fhandle;
-    try {
-      fhandle = await fs.open(filePath, 'a');
-    } catch (openError) {
-      console.error('Error opening file for appending:', openError);
-      // File might not exist yet, ignore the error
-    }
-    // Combine existing content with the new content
-    // existingContent ? '\n' : ''
-    // this part ensures that we only add a newline, if there is already existing content
-    // we add a newline, because above in the fid2replica method we split the log entries at '\n'
-    if (fhandle) {
-      // Write content to the file
-      console.log('Content to append: ', c)
-      await fhandle.appendFile(c);
-      // Append content to the local replica variable
-      r.logEntries.push(c);
-      console.log('Content appended successfully.');
-    } else {
-      // Handle the case where the file handle is undefined
-      console.error('File handle is undefined. Unable to append content.');
-    }
-    console.log('closing...')
-    await fhandle.close();
-  } catch (err) {
-    console.log('File Path: ', path.join(repoPath, `/${r.name}.log`))
-    console.error('Error appending content: ', err)
-  }*/
+  //const newBuffer = await fs.readFile(filePath)
+  //console.log('New content: ', newBuffer)
 }
 
 export function readContent(r, i) {

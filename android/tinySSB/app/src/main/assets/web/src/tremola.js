@@ -981,7 +981,13 @@ async function main () {
     console.log(listFeeds())
 
     await createReplica(tremola.id)
-    await fid2replica(tremola.id)
+    var r = await fid2replica(tremola.id)
+
+    for (let index in r.logEntries) {
+        if (r.logEntries[index]) {
+            console.log('decoded content: ', decode(r.logEntries[index], 0));
+        }
+    }
 }
 
 function writeContentInFeed() {}
@@ -1082,37 +1088,22 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         // letzten Eintrag vom Log gleich wieder lesen aus der Datei
         // Kriegen Byte-Array zurück; daraus gleich wieder lesen/ bezw. von BIPF zurück konvertieren.
 
-        //var b = allocAndEncode(d1)
-        //var d2 = decode(b)
         var ebipf = allocAndEncode(e)
         var r = await fid2replica(tremola.id)
 
-        //console.log('Before appending: ', r)
         await appendContent(r, ebipf)
-        //console.log('After appending: ', r)
 
-        /*const read_e = await readContent(r, 0)
-        console.log(read_e)
-        console.log(decode(read_e, 0))*/
         //TODO: Continue here/ Fix this
         const read_e = await readContent(r, r.logEntries.length -1);
         //const read_e = await readContent(r, 0);
-        console.log('read content: ', read_e);
-        console.log('decoded content: ', decode(read_e, 0));
 
-        console.log('Break for visibility:')
-        console.log('\n')
-
-        console.log(r)
-
-        for (let entry in r.logEntries) {
-            console.log('not decoded content: ', entry);
-        }
         for (let index in r.logEntries) {
             if (r.logEntries[index]) {
                 console.log('decoded content: ', decode(r.logEntries[index], 0));
             }
         }
+
+        //console.log('Whole array of log entries: ', decode(readAllContent(r)))
 
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         //TODO: hier wieder einkommentieren!!
@@ -1595,7 +1586,7 @@ function b2f_initialize(id) {
         console.log("reset tremola")
     }
     if (typeof Android == 'undefined')
-        console.log("loaded ", JSON.stringify(tremola))
+        //console.log("loaded ", JSON.stringify(tremola))
     if (!('settings' in tremola))
         tremola.settings = {}
     var nm, ref;
