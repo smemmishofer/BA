@@ -63,6 +63,8 @@ export var curr_img_candidate = null;
 var pubs = []
 var wants = {}
 
+var replicas = []
+
 var restream = false // whether the backend is currently restreaming all posts
 
 export function getNewContactID() {
@@ -577,19 +579,18 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
 
     item.innerHTML = row;
     document.getElementById('lst:contacts').appendChild(item);
-    console.log('before initshowcontactdetails: ', c)
     initshowcontactdetails(c)
 }
 
 function initshowcontactdetails(c) {
-    console.log(c)
+    //console.log(c)
     var strid = `show-contact-details${c[0]}`
     var showcontactdetails = document.getElementById(strid);
     // Assign the load_chat function to the onclick event handler of the button
     showcontactdetails.onclick = function() {
         show_contact_details("" + c[0] + "");
     };
-    console.log('Assigned onclick to:',c[0])
+    //console.log('Assigned onclick to:',c[0])
 }
 
 export function fill_members() {
@@ -612,12 +613,6 @@ export function fill_members() {
 }
 
 function show_contact_details(id) {
-    console.log('show_contact_details function: ', id)
-
-    for (var contact in tremola.contacts) {
-        console.log('contact:', contact)
-        console.log(tremola.contacts[contact].forgotten)
-    }
 
     if (id == myId) {
         document.getElementById('old_contact_alias_hdr').innerHTML = "Alias: (own name, visible to others)"
@@ -1048,11 +1043,15 @@ async function main () {
     //testBipfEncoding()
     //bipfTest2()
 
+    console.log('Tremola ID: ', tremola.id)
+
     for (var contact in tremola.contacts) {
         console.log('contact:', contact)
-        console.log(tremola.contacts[contact])
-        //load_contact_item([contact, tremola.contacts[contact]]);
-        //initshowcontactdetails([contact, tremola.contacts[contact]])
+
+        await createReplica(contact)
+        var r = await fid2replica(contact)
+        replicas.push(r)
+
         tremola.contacts[contact].forgotten = false
     }
     menu_redraw()
@@ -1063,14 +1062,25 @@ async function main () {
         .catch(error => console.log('Error loading Repo'))
     console.log(listFeeds())
 
-    await createReplica(tremola.id)
-    var r = await fid2replica(tremola.id)
+    // await createReplica(tremola.id)
+    // var r = await fid2replica(tremola.id)
+
+    for (let r in replicas) {
+        console.log('replica: ', replicas[r])
+        for (let index in replicas[r].logEntries) {
+            if (replicas[r].logEntries[index]) {
+                console.log('decoded content: ', decode(replicas[r].logEntries[index], 0));
+            }
+        }
+    }
+
+    /*console.log('log Entries: ', r.logEntries)
 
     for (let index in r.logEntries) {
         if (r.logEntries[index]) {
             console.log('decoded content: ', decode(r.logEntries[index], 0));
         }
-    }
+    }*/
 }
 
 function writeContentInFeed() {}
@@ -1180,17 +1190,19 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         const read_e = await readContent(r, r.logEntries.length -1);
         //const read_e = await readContent(r, 0);
 
-        for (let index in r.logEntries) {
-            if (r.logEntries[index]) {
-                console.log('decoded content: ', decode(r.logEntries[index], 0));
+        //console.log('Whole array of log entries: ', decode(readAllContent(r)))
+        for (let r in replicas) {
+            console.log('replica: ', r)
+            for (let index in r.logEntries) {
+                if (r.logEntries[index]) {
+                    console.log('decoded content: ', decode(r.logEntries[index], 0));
+                }
             }
         }
 
-        //console.log('Whole array of log entries: ', decode(readAllContent(r)))
-
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         //TODO: hier wieder einkommentieren!!
-        b2f_new_event(e)
+        //b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
