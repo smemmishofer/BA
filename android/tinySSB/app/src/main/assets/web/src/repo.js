@@ -60,11 +60,16 @@ export async function createReplica(fid) {
     // Write an empty file (you can later write binary data to it)
     var filePath = path.join(repoPath, `/${fid}.log`)
     var fhandle = await fs.open(filePath, 'a');
+    fidlist.push(fid)
     await fhandle.close()
     console.log('File created successfully:', path.join(repoPath, `/${fid}.log`));
   } catch (err) {
     console.error('Error creating file: ', err)
   }
+}
+
+export function getReplicas() {
+  return replicas
 }
 
 export async function fid2replica(fid) {

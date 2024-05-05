@@ -31,7 +31,16 @@ import {
     menu_board_invitations,
     menu_new_board_name
 } from "./board_ui.js";
-import {appendContent, createReplica, fid2replica, listFeeds, loadRepo, readAllContent, readContent,} from "./repo.js";
+import {
+    appendContent,
+    createReplica,
+    fid2replica,
+    getReplicas,
+    listFeeds,
+    loadRepo,
+    readAllContent,
+    readContent,
+} from "./repo.js";
 import { decode } from './bipf/decode.js'
 import { allocAndEncode, encode } from "./bipf/encode.js";
 import { seekKey } from "./bipf/seekers.js";
@@ -63,7 +72,7 @@ export var curr_img_candidate = null;
 var pubs = []
 var wants = {}
 
-var replicas = []
+var replicas = {}
 
 var restream = false // whether the backend is currently restreaming all posts
 
@@ -1031,7 +1040,26 @@ async function main () {
     console.log('Current Platform: ', process.platform)
     //console.log('Documents Path: ', path.DOCUMENTS)
     backend('ready')
+
     await initP2P()
+    initP2P().then(() => {
+        try {
+            cats.on('mew', value => {
+                console.log('Received new P2P message: ', value)
+            })
+            // A message will be published into this subcluster
+            //cats.emit('mew', { food: true })
+
+            // Another peer from this subcluster has directly connected to you.
+            cats.on('#join', peer => {
+                peer.on('mew', value => {
+                    console.log('P2P join: ', value)
+                })
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    })
 
     //clearAllPersistedData()
     if (process.platform == 'ios') {
@@ -1050,11 +1078,14 @@ async function main () {
 
         await createReplica(contact)
         var r = await fid2replica(contact)
-        replicas.push(r)
 
         tremola.contacts[contact].forgotten = false
     }
     menu_redraw()
+
+    console.log('\n')
+    console.log('Replicas: ', getReplicas())
+    console.log('\n')
 
     //TODO: loadRepo
     loadRepo()
@@ -1065,11 +1096,13 @@ async function main () {
     // await createReplica(tremola.id)
     // var r = await fid2replica(tremola.id)
 
-    for (let r in replicas) {
-        console.log('replica: ', replicas[r])
-        for (let index in replicas[r].logEntries) {
-            if (replicas[r].logEntries[index]) {
-                console.log('decoded content: ', decode(replicas[r].logEntries[index], 0));
+    for (const [key, value] of Object.entries(getReplicas())) {
+        const r = value;
+        console.log('replica key: ', key);
+        console.log('replica value: ', r);
+        for (const entry of r.logEntries) {
+            if (entry) {
+                console.log('decoded content: ', decode(entry, 0));
             }
         }
     }
@@ -1081,6 +1114,8 @@ async function main () {
             console.log('decoded content: ', decode(r.logEntries[index], 0));
         }
     }*/
+
+    console.log(generateWantVector(getReplicas()))
 }
 
 function writeContentInFeed() {}
@@ -1130,13 +1165,21 @@ async function initP2P() {
 /*
 v für want-Vektor
 Idee: von jedem Feed sagen, diese FeedID und diese seqNr habe ich
-
 Zuerst noch als BIPF konvertieren
 bipf(['v', {fid:seqNr}])
-
 Als Antwort: entry schicken, mit allen Angaben.
 bipf(['e', fid, seqNr, data])
  */
+function generateWantVector(replicas) {
+    const fidSeqNrMap = {};
+    Object.keys(replicas).forEach(fid => {
+        const replica = replicas[fid];
+        // +1, because we want to get back 1 entry later
+        fidSeqNrMap[fid] = replica.logEntries.length + 1;
+    });
+    const wantVec = ['v', fidSeqNrMap];
+    return wantVec;
+}
 
 function sendP2P(msg) {
     try {
@@ -1183,6 +1226,8 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
 
         var ebipf = allocAndEncode(e)
         var r = await fid2replica(tremola.id)
+        if(replicas)
+            //TODO: Continue here
 
         await appendContent(r, ebipf)
 
@@ -1191,11 +1236,13 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         //const read_e = await readContent(r, 0);
 
         //console.log('Whole array of log entries: ', decode(readAllContent(r)))
-        for (let r in replicas) {
-            console.log('replica: ', r)
-            for (let index in r.logEntries) {
-                if (r.logEntries[index]) {
-                    console.log('decoded content: ', decode(r.logEntries[index], 0));
+        for (const [key, value] of Object.entries(getReplicas())) {
+            const r = value;
+            console.log('replica key: ', key);
+            console.log('replica value: ', r);
+            for (const entry of r.logEntries) {
+                if (entry) {
+                    console.log('decoded content: ', decode(entry, 0));
                 }
             }
         }
