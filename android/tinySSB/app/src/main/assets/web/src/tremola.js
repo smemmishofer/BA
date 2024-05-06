@@ -1114,11 +1114,14 @@ async function main () {
     }*/
 
     console.log(generateWantVector(getReplicas()))
+
+    // Start worker-Thread, which sends Want-Vector periodically
+    //const p2pworker = new Worker('p2pworker.js')
 }
 
-function writeContentInFeed() {}
-
 window.addEventListener('DOMContentLoaded', main)
+
+//const p2pworker = new Worker('p2pworker.js')
 
 function adjustFormatToIOS() {
     console.log('Adjusting format to ios')
@@ -1168,7 +1171,7 @@ bipf(['v', {fid:seqNr}])
 Als Antwort: entry schicken, mit allen Angaben.
 bipf(['e', fid, seqNr, data])
  */
-function generateWantVector(replicas) {
+export function generateWantVector(replicas) {
     const fidSeqNrMap = {};
     Object.keys(replicas).forEach(fid => {
         const replica = replicas[fid];
@@ -1179,10 +1182,12 @@ function generateWantVector(replicas) {
     return wantVec;
 }
 
-function sendP2P(msg) {
+export function sendP2P(msg) {
     try {
-        cats.emit('mew', Buffer.from(JSON.stringify(msg)))
-        console.log('msg emitted into P2P network: ', msg)
+        if (msg.length > 0) {
+            cats.emit('mew', Buffer.from(JSON.stringify(msg)))
+            console.log('msg emitted into P2P network: ', msg)
+        }
     } catch (err) {
         console.error(err)
     }

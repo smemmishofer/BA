@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
 <head>
-  <meta charset="UTF-8"
+<!--  <meta charset="UTF-8"
         http-equiv="Content-Security-Policy"
         content="
         connect-src https: file: ipc: socket: npm: ws://localhost:*;
@@ -11,18 +11,31 @@
         child-src 'none';
         object-src 'none';
         default-src 'self' file: data: https:;
+        worker-src socket: blob:;
+      "
+  >-->
+  <meta
+          http-equiv="Content-Security-Policy"
+          content="
+        connect-src socket: https: http: blob: npm: node: ipc: wss: ws: ws://localhost:*;
+         script-src socket: https: http: blob: npm: node: http://localhost:* 'unsafe-eval' 'unsafe-inline';
+         worker-src socket: https: http: blob: 'unsafe-eval' 'unsafe-inline';
+          frame-src socket: https: http: blob: http://localhost:*;
+            img-src socket: https: http: blob: http://localhost:*;
+          child-src socket: https: http: blob:;
+         object-src 'none';
       "
   >
   <link rel="stylesheet" type="text/css" href="tremola.css" media="screen" />
-  <script type="text/javascript" charset="UTF-8" src="scuttlesort.js"></script>
+  <script type="module" charset="UTF-8" src="scuttlesort.js"></script>
 <!--  <script src="fvbundle.js"></script>-->
 <!--  <script type="module" src="bipfbundle.js"></script>-->
 <!--  <script type="module" src="bundled.js"></script>-->
   <script type="module" src="tremola_ui.js"></script>
   <script type="module" src="tremola.js"></script>
   <script type="module" src="tremola_settings.js"></script>
-  <script type="module" charset="UTF-8" src="qrcode.js"></script>
-  <script type="text/javascript" charset="UTF-8" src="pinch-zoom.min.js"></script>
+  <script type="module" src="qrcode.js"></script>
+  <script type="module" charset="UTF-8" src="pinch-zoom.min.js"></script>
   <script type="module" charset="UTF-8" src="board.js"></script>
   <script type="module" src="board_ui.js"></script>
 </head>
