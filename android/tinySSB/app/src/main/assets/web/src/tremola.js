@@ -72,8 +72,6 @@ export var curr_img_candidate = null;
 var pubs = []
 var wants = {}
 
-var replicas = {}
-
 var restream = false // whether the backend is currently restreaming all posts
 
 export function getNewContactID() {
@@ -1044,18 +1042,18 @@ async function main () {
     await initP2P()
     initP2P().then(() => {
         try {
-            cats.on('mew', value => {
-                console.log('Received new P2P message: ', value)
+            cats.on('mew', buf => {
+                console.log('Received new P2P message: ', JSON.parse(buf))
             })
             // A message will be published into this subcluster
             //cats.emit('mew', { food: true })
 
             // Another peer from this subcluster has directly connected to you.
-            cats.on('#join', peer => {
+            /*cats.on('#join', peer => {
                 peer.on('mew', value => {
                     console.log('P2P join: ', value)
                 })
-            })
+            })*/
         } catch (err) {
             console.error(err)
         }
@@ -1183,7 +1181,7 @@ function generateWantVector(replicas) {
 
 function sendP2P(msg) {
     try {
-        cats.emit('mew', msg)
+        cats.emit('mew', Buffer.from(JSON.stringify(msg)))
         console.log('msg emitted into P2P network: ', msg)
     } catch (err) {
         console.error(err)
@@ -1226,7 +1224,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
 
         var ebipf = allocAndEncode(e)
         var r = await fid2replica(tremola.id)
-        if(replicas)
+        //if(replicas)
             //TODO: Continue here
 
         await appendContent(r, ebipf)
