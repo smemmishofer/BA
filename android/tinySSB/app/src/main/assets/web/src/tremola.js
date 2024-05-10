@@ -1328,9 +1328,37 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         // console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
         //console.log(e)
-    } else {
+    } else if (cmdStr[0] == 'restream') {
+        //console.log('Tremola object: ', tremola)
+        restreamChats()
+    }
+
+    else {
         console.log('backend', JSON.stringify(cmdStr))
     }
+}
+
+function restreamChats() {
+    // delete all the chats
+    document.getElementById('lst:chats').innerHTML = '';
+
+    //TODO: is it enough to rely on the local Replicas, or should I also
+    //TODO: read the content from the files again and generate 'fresh' replica objects?
+    for (const [key, value] of Object.entries(getReplicas())) {
+        const r = value;
+        //console.log('replica key: ', key);
+        //console.log('replica value: ', r);
+        for (const entry of r.logEntries) {
+            if (entry) {
+                var decodedObj = decode(entry, 0)
+                console.log('decoded content: ', decodedObj);
+                console.log(decodedObj['public'][1])
+                b2f_new_event(decodedObj)
+            }
+        }
+    }
+
+    // new_text_post(document.getElementById('draft').value);
 }
 
 function resetTremola() { // wipes browser-side content
