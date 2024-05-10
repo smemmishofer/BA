@@ -22,7 +22,13 @@ import {
     menu_settings,
     menu_about,
 } from "./tremola_ui.js";
-import {get_default_settings, setSetting, toggle_changed} from "./tremola_settings.js";
+import {
+    get_default_settings,
+    setSetting, settings_clear_other_feeds,
+    settings_reset_ui,
+    settings_restream_posts,
+    toggle_changed
+} from "./tremola_settings.js";
 import {
     btn_create_personal_board_accept,
     btn_create_personal_board_decline,
@@ -912,6 +918,7 @@ function initializeAllButtons() {
     };
     var divqr = document.getElementById('btn:qr');
     divqr.onclick = function() {
+        console.log('Assigning qrButton...')
         showQR();
     };
     var overlaybg = document.getElementById('overlay-bg');
@@ -1010,6 +1017,18 @@ function initializeAllButtons() {
     background_map.onchange = function () {
         toggle_changed(this)
     }
+    var settingsrestreamposts = document.getElementById('settings_restream_posts');
+    settingsrestreamposts.onclick = function () {
+        settings_restream_posts();
+    }
+    var settingsresetui = document.getElementById('settings_reset_ui');
+    settingsresetui.onclick = function () {
+        settings_reset_ui();
+    }
+    var settingsclearotherfeeds = document.getElementById('settings_clear_other_feeds');
+    settingsclearotherfeeds.onclick = function () {
+        settings_clear_other_feeds();
+    }
 }
 
 export function assignMenuOnClick() {
@@ -1043,13 +1062,14 @@ async function main () {
     initP2P().then(() => {
         try {
             cats.on('mew', buf => {
-                console.log('Received new P2P message: ', JSON.parse(buf))
+                console.log('before json decoding: ', buf)
+                console.log('Received new P2P message: ', JSON.parse(buf.toString()))
             })
             // A message will be published into this subcluster
             //cats.emit('mew', { food: true })
 
             // Another peer from this subcluster has directly connected to you.
-            /*cats.on('#join', peer => {
+/*            cats.on('#join', peer => {
                 peer.on('mew', value => {
                     console.log('P2P join: ', value)
                 })
@@ -1115,11 +1135,32 @@ async function main () {
 
     console.log(generateWantVector(getReplicas()))
 
+    // Send Want-Vector once every second.
+    //TODO: Fix encoding/decoding want-Vector while sending over the newtork
+    //setInterval(sendWantVector, 5000)
+
     // Start worker-Thread, which sends Want-Vector periodically
     //const p2pworker = new Worker('p2pworker.js')
+    //p2pworker.postMessage()
 }
 
 window.addEventListener('DOMContentLoaded', main)
+
+function sendWantVector() {
+    try {
+        console.log('WANT-vector sent from worker-thread')
+
+        const replicas = getReplicas()
+
+        const wantVec = generateWantVector(replicas)
+
+        console.log(wantVec)
+
+        sendP2P(JSON.stringify(wantVec))
+    } catch (err) {
+        console.error('Error when sending want-vector: ', err)
+    }
+}
 
 //const p2pworker = new Worker('p2pworker.js')
 
@@ -1178,7 +1219,7 @@ export function generateWantVector(replicas) {
         // +1, because we want to get back 1 entry later
         fidSeqNrMap[fid] = replica.logEntries.length + 1;
     });
-    const wantVec = ['v', fidSeqNrMap];
+    const wantVec = { type:'v', content: fidSeqNrMap };
     return wantVec;
 }
 
@@ -1187,6 +1228,8 @@ export function sendP2P(msg) {
         if (msg.length > 0) {
             cats.emit('mew', Buffer.from(JSON.stringify(msg)))
             console.log('msg emitted into P2P network: ', msg)
+        } else {
+            console.log('msg length is 0 !!')
         }
     } catch (err) {
         console.error(err)
@@ -1251,8 +1294,10 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         }
 
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
+        //TODO: Implement "restream" --> See backend("restream"); in settings_restream_posts() method!
+
         //TODO: hier wieder einkommentieren!!
-        //b2f_new_event(e)
+        b2f_new_event(e)
         sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
@@ -1284,7 +1329,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         b2f_new_event(e)
         //console.log(e)
     } else {
-        // console.log('backend', JSON.stringify(cmdStr))
+        console.log('backend', JSON.stringify(cmdStr))
     }
 }
 
@@ -1325,6 +1370,7 @@ export function persist() {
 }
 
 import { createRequire } from 'socket:module'
+import {Timeline} from "./scuttlesort.js";
 //const require = createRequire(import.meta.url)
 //require('./path/to/entry.js')
 //import {allocAndEncode, decode, seekKey} from './bundled.js'
@@ -1698,6 +1744,7 @@ function b2f_new_voice(voice_b64) {
 }
 
 function b2f_showSecret(json) {
+    console.log('b2f_showSecret method')
     //setScenario(prev_scenario);
     generateQR(json)
 }

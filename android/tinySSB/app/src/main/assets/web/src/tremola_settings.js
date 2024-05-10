@@ -3,6 +3,7 @@
 "use strict";
 
 import {tremola, backend, persist, load_chat_list, load_contact_list} from "./tremola.js";
+import {launch_snackbar, setScenario} from "./tremola_ui.js";
 
 export function get_default_settings() {
     return {
@@ -101,14 +102,14 @@ function enter_setWebsocketUrl(ev) {
     }
 }
 
-function settings_restream_posts() {
+export function settings_restream_posts() {
     // closeOverlay();
     setScenario('chats')
     launch_snackbar("DB restreaming launched");
     backend("restream");
 }
 
-function settings_reset_ui() {
+export function settings_reset_ui() {
     closeOverlay();
     resetTremola();
     setScenario('chats');
@@ -117,7 +118,7 @@ function settings_reset_ui() {
     backend("reset");
 }
 
-function settings_clear_other_feeds() {
+export function settings_clear_other_feeds() {
     backend("wipe:others")
     closeOverlay()
     settings_reset_ui()

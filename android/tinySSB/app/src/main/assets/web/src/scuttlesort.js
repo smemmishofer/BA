@@ -6,7 +6,7 @@
 
 "use strict"
 
-class Timeline {
+export class Timeline {
 
     constructor(update_cb) {
         this.linear = [];

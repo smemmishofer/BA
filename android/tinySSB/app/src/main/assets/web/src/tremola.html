@@ -21,7 +21,7 @@
          script-src socket: https: http: blob: npm: node: http://localhost:* 'unsafe-eval' 'unsafe-inline';
          worker-src socket: https: http: blob: 'unsafe-eval' 'unsafe-inline';
           frame-src socket: https: http: blob: http://localhost:*;
-            img-src socket: https: http: blob: http://localhost:*;
+            img-src socket: https: http: blob: http://localhost:* data:;
           child-src socket: https: http: blob:;
          object-src 'none';
       "
@@ -534,11 +534,11 @@
     <hr>
 
 
-    <p><button class="w100 button active item" style="height: 2.5em;" onclick="settings_restream_posts();">
+    <p><button id="settings_restream_posts" class="w100 button active item" style="height: 2.5em;">
       Re-stream posts</button><hr>
-    <p><button class="w100 button active item" style="height: 2.5em;" onclick="settings_reset_ui();">
+    <p><button id="settings_reset_ui" class="w100 button active item" style="height: 2.5em;">
       Reset UI + Re-stream (but keep ID)</button><hr>
-    <p><button class="w100 button active item" style="height: 2.5em;" onclick="settings_clear_other_feeds()">
+    <p><button id="settings_clear_other_feeds" class="w100 button active item" style="height: 2.5em;">
       Delete all logs except your own (but keep ID)</button><hr>
     <p><button class="w100 button active item" style="height: 2.5em;" onclick="menu_import_id()">
       Import new secret key (also erases DB)</button><hr>
