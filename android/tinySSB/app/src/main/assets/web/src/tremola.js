@@ -1246,7 +1246,7 @@ export function generateWantVector(replicas) {
     return wantVec;
 }
 
-function receiveP2P(vector) {
+async function receiveP2P(vector) {
     console.log('vector: ', vector)
 
     if (vector.type == 'v') {
@@ -1266,6 +1266,7 @@ function receiveP2P(vector) {
                     // TODO: Test, ob sequenznummern stimmen!
                     const entryToSend = replicas[fid].logEntries[desiredEntry -1]
                     const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:entryToSend } };
+                    //TODO: send dataVec over P2P!!
 
                     console.log('send data packet with number: ', desiredEntry)
                     console.log('data vector to send: ', dataVec)
@@ -1281,6 +1282,19 @@ function receiveP2P(vector) {
     } else if (vector.type == 'd') {
         //TODO: append new log entry to file system, if seq.Nr. is matching...
         console.log('vector is a data vector')
+
+        replicas = getReplicas()
+        if (vector.content.fid in replicas) {
+            var r = replicas[vector.content.fid]
+            var currSeqNr = r.logEntries.length
+
+            // Append only if seqNr matches exactly!!
+            if (vector.content.seqNr === currSeqNr + 1) {
+                await appendContent(r, vector.content.entry)
+            }
+        } else {
+            // do nothing, as we don't have the fid in our replica object / content list...
+        }
     } else {
         console.error('vector is of unkonwn format')
     }
