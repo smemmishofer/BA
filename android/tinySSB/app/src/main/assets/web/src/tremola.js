@@ -39,7 +39,7 @@ import {
 } from "./board_ui.js";
 import {
     appendContent,
-    createReplica,
+    createReplica, delReplicas,
     fid2replica,
     getReplicas,
     listFeeds,
@@ -1062,8 +1062,11 @@ async function main () {
     initP2P().then(() => {
         try {
             cats.on('mew', buf => {
-                console.log('before json decoding: ', buf)
-                console.log('Received new P2P message: ', JSON.parse(buf.toString()))
+                //console.log('before json decoding: ', buf)
+                console.log('p2p msg received:')
+                console.log('Received new P2P message: ', JSON.parse(buf))
+                //console.log('Received new P2P message: ', buf)
+                //console.log(allocAndEncode(generateWantVector()))
             })
             // A message will be published into this subcluster
             //cats.emit('mew', { food: true })
@@ -1137,7 +1140,8 @@ async function main () {
 
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
-    //setInterval(sendWantVector, 5000)
+    setInterval(sendWantVector, 5000)
+    //sendWantVector()
 
     // Start worker-Thread, which sends Want-Vector periodically
     //const p2pworker = new Worker('p2pworker.js')
@@ -1154,9 +1158,28 @@ function sendWantVector() {
 
         const wantVec = generateWantVector(replicas)
 
-        console.log(wantVec)
+        /*console.log(wantVec)
+        console.log(JSON.stringify(wantVec))
+        console.log(JSON.parse(JSON.stringify(wantVec)))
+        console.log('\n')
+        console.log(JSON.parse(Buffer.from(JSON.stringify(wantVec)).toString()))*/
 
-        sendP2P(JSON.stringify(wantVec))
+        //sendP2P(wantVec)
+        //var buf = allocAndEncode('test')
+        var trem = Buffer.from(JSON.stringify(tremola))
+        cats.emit('mew', trem)
+
+        // For testing receive() method:
+        var artificialWantVec = {
+            type: 'v',
+            content: {
+                '@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519': 5,
+                '@BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=.ed25519': 1,
+                '@CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=.ed25519': 1
+            }
+        };
+
+        receiveP2P(artificialWantVec)
     } catch (err) {
         console.error('Error when sending want-vector: ', err)
     }
@@ -1185,8 +1208,8 @@ async function initP2P() {
 //
 // Create (or read from storage) a clusterID and a symmetrical/shared key.
 //
-        const clusterId = await Encryption.createClusterId('TEST')
-        const sharedKey = await Encryption.createSharedKey('TEST')
+        const clusterId = await Encryption.createClusterId('6e400001-7646-4b5b-9a50-71becce51558')
+        const sharedKey = await Encryption.createSharedKey('6e400001-7646-4b5b-9a50-71becce51558')
 
 //
 // Create a socket that can send a receive network events. The clusterId
@@ -1223,10 +1246,50 @@ export function generateWantVector(replicas) {
     return wantVec;
 }
 
+function receiveP2P(vector) {
+    console.log('vector: ', vector)
+
+    if (vector.type == 'v') {
+        console.log('vector is a want vector')
+        var fidSeqNrMap = vector.content
+        var replicas = getReplicas()
+
+        Object.keys(fidSeqNrMap).forEach(fid => {
+            const desiredEntry = fidSeqNrMap[fid];
+            // +1, because we want to get back 1 entry later
+            if (fid in replicas) {
+                var mostRecentEntry = replicas[fid].logEntries.length
+                if (mostRecentEntry >= desiredEntry) {
+                    //TODO: Send LogEntry in 'data'-vector
+
+                    // -1, because logEntries is an array and if it has 1 element, we want the one at pos. 0
+                    // TODO: Test, ob sequenznummern stimmen!
+                    const entryToSend = replicas[fid].logEntries[desiredEntry -1]
+                    const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:entryToSend } };
+
+                    console.log('send data packet with number: ', desiredEntry)
+                    console.log('data vector to send: ', dataVec)
+                    console.log('corresponding log entry: ', decode(dataVec.content.entry, 0))
+                    // then return because we only send 1 packet
+                    return;
+                }
+            }
+        });
+
+        // If we are here, we have not found a fitting entry
+        console.log('no fitting entry found; either we dont have the fid or we dont have a new package')
+    } else if (vector.type == 'd') {
+        //TODO: append new log entry to file system, if seq.Nr. is matching...
+        console.log('vector is a data vector')
+    } else {
+        console.error('vector is of unkonwn format')
+    }
+}
+
 export function sendP2P(msg) {
     try {
-        if (msg.length > 0) {
-            cats.emit('mew', Buffer.from(JSON.stringify(msg)))
+        if (msg != null) {
+            cats.emit('mew', msg)
             console.log('msg emitted into P2P network: ', msg)
         } else {
             console.log('msg length is 0 !!')
@@ -1330,7 +1393,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         //console.log(e)
     } else if (cmdStr[0] == 'restream') {
         //console.log('Tremola object: ', tremola)
-        restreamChats()
+        await restreamChats()
     }
 
     else {
@@ -1338,12 +1401,21 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     }
 }
 
-function restreamChats() {
+async function restreamChats() {
     // delete all the chats
     document.getElementById('lst:chats').innerHTML = '';
 
     //TODO: is it enough to rely on the local Replicas, or should I also
     //TODO: read the content from the files again and generate 'fresh' replica objects?
+    delReplicas()
+    // After the replicas are deleted; create new replica objects for all contacts like in main()
+    for (var contact in tremola.contacts) {
+        console.log('contact:', contact)
+
+        await createReplica(contact)
+        var r = await fid2replica(contact)
+    }
+
     for (const [key, value] of Object.entries(getReplicas())) {
         const r = value;
         //console.log('replica key: ', key);

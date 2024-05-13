@@ -3,7 +3,7 @@ import path from 'socket:path'
 import { decode } from './bipf/decode.js'
 
 const fidlist = [];
-const replicas = {};
+var replicas = {};
 const repoPath = path.join(path.DOCUMENTS, './repo/')
 // --> Use Path.DOCUMENTS; it is more predictable where the files get saved
 // --> May change later, if necessary
@@ -70,6 +70,10 @@ export async function createReplica(fid) {
 
 export function getReplicas() {
   return replicas
+}
+
+export function delReplicas() {
+  replicas = {};
 }
 
 export async function fid2replica(fid) {
