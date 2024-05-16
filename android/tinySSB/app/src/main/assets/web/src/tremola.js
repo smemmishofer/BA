@@ -51,14 +51,12 @@ import { decode } from './bipf/decode.js'
 import { allocAndEncode, encode } from "./bipf/encode.js";
 import { seekKey } from "./bipf/seekers.js";
 
-//import {allocAndEncode, decode, seekKey} from './bundled.js'
-//const bipf = import('./bundled.js');
-
 // Changes for socket library
 import process from 'socket:process'
 import path from 'socket:path'
 import {Encryption, network} from "socket:network";
 import {createBoard} from "./board.js";
+import {Timeline} from "./scuttlesort.js";
 
 export var tremola;
 export var curr_chat;
@@ -1067,6 +1065,7 @@ async function main () {
                 var string = new TextDecoder().decode(buf.data);
                 console.log('decoded string: ', string)
                 console.log('Received new P2P message: ', JSON.parse(string))
+                //TODO: Call receiveP2P() method here with the decoded string (want-or data-vector) !!!
             })
         } catch (err) {
             console.error(err)
@@ -1113,6 +1112,7 @@ async function main () {
 
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
+    //TODO: comment here to get P2P functionality to work
     //setInterval(sendWantVector, 5000)
     //sendWantVector()
 }
@@ -1164,8 +1164,8 @@ function sendWantVector() {
             }
         };
 
-        receiveP2P(artificialWantVec)
-        receiveP2P(artificialDataVec)
+        // receiveP2P(artificialWantVec)
+        // receiveP2P(artificialDataVec)
     } catch (err) {
         console.error('Error when sending want-vector: ', err)
     }
@@ -1483,21 +1483,12 @@ export function resetTremola() { // wipes browser-side content
 
 export function persist() {
     console.log('Data saved persistently');
-    window.localStorage.setItem("tremola", JSON.stringify(tremola));
+    window.localStorage.setItem(`tremola${process.env.KEY}`, JSON.stringify(tremola));
     //window.localStorage.removeItem("tremola");
     //await testBipfEncoding()
 }
 
-import { createRequire } from 'socket:module'
-import {Timeline} from "./scuttlesort.js";
-//const require = createRequire(import.meta.url)
-//require('./path/to/entry.js')
-//import {allocAndEncode, decode, seekKey} from './bundled.js'
-
 function testBipfEncoding() {
-    //import {allocAndEncode, decode, seekKey} from './bundled.js'
-    //import * as bipf from './bundled.js'
-    //const bipf = import('./bundled.js'); // Importing using require
     console.log('Encoding & Decoding Buffer');
 
     // Allocate and encode a correctly sized buffer
