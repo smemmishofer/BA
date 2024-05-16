@@ -1,11 +1,21 @@
 import fs from 'socket:fs/promises'
 import path from 'socket:path'
 import { decode } from './bipf/decode.js'
+import process from 'socket:process'
 
 var fidlist = [];
 var replicas = {};
 
-const repoPath = path.join(path.DOCUMENTS, './repo/')
+// User should be given via the environment variable; else the path defaults to /repo
+const key = process.env.KEY
+
+let repoPath;
+if(key) {
+  repoPath = path.join(path.DOCUMENTS, 'repo', key)
+} else {
+  repoPath = path.join(path.DOCUMENTS, 'repo')
+}
+console.log('Repo Path:', repoPath);
 const ignoredFiles = ['.DS_Store'];
 // --> Use Path.DOCUMENTS; it is more predictable where the files get saved
 // --> May change later, if necessary

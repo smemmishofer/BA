@@ -1086,10 +1086,10 @@ async function main () {
     //console.log('Tremola ID: ', tremola.id)
 
     for (var contact in tremola.contacts) {
-        //console.log('contact:', contact)
+        console.log('contact:', contact)
 
         await createReplica(contact)
-        var r = await fid2replica(contact)
+        await fid2replica(contact)
 
         tremola.contacts[contact].forgotten = false
     }
@@ -1102,6 +1102,14 @@ async function main () {
         .catch(error => console.log('Error loading Repo'))
 
     console.log(generateWantVector(getReplicas()))
+
+    // Test passing command line arguments via environment variables:
+    console.log('KEY environment variable: ', process.env.KEY)
+    if (process.env.KEY != null) {
+        console.log('KEY: ', process.env.KEY)
+    } else {
+        console.log('KEY is not defined ...')
+    }
 
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
@@ -1389,8 +1397,13 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         // console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
         //console.log(e)
-    } else if (cmdStr[0] == 'restream') {
+    } else if (cmdStr[0] === 'restream') {
         //console.log('Tremola object: ', tremola)
+        await restreamAllLogs()
+    } else if (cmdStr[0] === 'reset') {
+        //console.log('Backend reset ...')
+        //TODO: Maybe change the ID here??
+        b2f_initialize('@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519')
         await restreamAllLogs()
     }
 
