@@ -2,9 +2,11 @@ import fs from 'socket:fs/promises'
 import path from 'socket:path'
 import { decode } from './bipf/decode.js'
 
-const fidlist = [];
+var fidlist = [];
 var replicas = {};
+
 const repoPath = path.join(path.DOCUMENTS, './repo/')
+const ignoredFiles = ['.DS_Store'];
 // --> Use Path.DOCUMENTS; it is more predictable where the files get saved
 // --> May change later, if necessary
 
@@ -28,14 +30,20 @@ export async function loadRepo() {
   try {
     const dir = await fs.opendir(repoPath)
     for await (const dirent of dir) {
-      if (dirent.isFile()) {
+      if (dirent.isFile() && !ignoredFiles.includes(dirent.name)) {
         fidlist.push(dirent.name)
       }
     }
-    console.log('fidlist: ', fidlist)
+    //console.log('fidlist: ', fidlist)
   } catch (err) {
     console.error('Error scanning file names: ', err)
   }
+}
+
+export function delRepo() {
+  // Reset local repo objects
+  replicas = {};
+  fidlist = [];
 }
 
 export function listFeeds() {
@@ -70,10 +78,6 @@ export async function createReplica(fid) {
 
 export function getReplicas() {
   return replicas
-}
-
-export function delReplicas() {
-  replicas = {};
 }
 
 export async function fid2replica(fid) {

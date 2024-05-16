@@ -2,8 +2,8 @@
 
 "use strict";
 
-import {tremola, backend, persist, load_chat_list, load_contact_list} from "./tremola.js";
-import {launch_snackbar, setScenario} from "./tremola_ui.js";
+import {tremola, backend, persist, load_chat_list, load_contact_list, resetTremola, menu_redraw} from "./tremola.js";
+import {closeOverlay, launch_snackbar, setScenario} from "./tremola_ui.js";
 
 export function get_default_settings() {
     return {

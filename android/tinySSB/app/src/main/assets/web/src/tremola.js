@@ -39,7 +39,7 @@ import {
 } from "./board_ui.js";
 import {
     appendContent,
-    createReplica, delReplicas,
+    createReplica, delRepo,
     fid2replica,
     getReplicas,
     listFeeds,
@@ -133,7 +133,7 @@ function menu_invite() {
     menu_edit('new_invite_target', "Enter invite code<br><br>Format:<br><tt>IP_ADDR:PORT:@ID_OF_PUB.ed25519~INVITE_CODE</tt>", "");
 }
 
-function menu_redraw() {
+export function menu_redraw() {
     closeOverlay();
 
     load_chat_list()
@@ -1064,19 +1064,10 @@ async function main () {
             cats.on('mew', buf => {
                 //console.log('before json decoding: ', buf)
                 console.log('p2p msg received:')
-                console.log('Received new P2P message: ', JSON.parse(buf))
-                //console.log('Received new P2P message: ', buf)
-                //console.log(allocAndEncode(generateWantVector()))
+                var string = new TextDecoder().decode(buf.data);
+                console.log('decoded string: ', string)
+                console.log('Received new P2P message: ', JSON.parse(string))
             })
-            // A message will be published into this subcluster
-            //cats.emit('mew', { food: true })
-
-            // Another peer from this subcluster has directly connected to you.
-/*            cats.on('#join', peer => {
-                peer.on('mew', value => {
-                    console.log('P2P join: ', value)
-                })
-            })*/
         } catch (err) {
             console.error(err)
         }
@@ -1092,60 +1083,30 @@ async function main () {
     //testBipfEncoding()
     //bipfTest2()
 
-    console.log('Tremola ID: ', tremola.id)
+    //console.log('Tremola ID: ', tremola.id)
 
     for (var contact in tremola.contacts) {
-        console.log('contact:', contact)
+        //console.log('contact:', contact)
 
         await createReplica(contact)
         var r = await fid2replica(contact)
 
         tremola.contacts[contact].forgotten = false
     }
-    menu_redraw()
 
-    console.log('\n')
-    console.log('Replicas: ', getReplicas())
-    console.log('\n')
-
-    //TODO: loadRepo
     loadRepo()
-        .then(() => console.log('successfully loaded files'))
+        .then(() => {
+            console.log('successfully loaded files')
+            //console.log(listFeeds())
+        })
         .catch(error => console.log('Error loading Repo'))
-    console.log(listFeeds())
-
-    // await createReplica(tremola.id)
-    // var r = await fid2replica(tremola.id)
-
-    for (const [key, value] of Object.entries(getReplicas())) {
-        const r = value;
-        console.log('replica key: ', key);
-        console.log('replica value: ', r);
-        for (const entry of r.logEntries) {
-            if (entry) {
-                console.log('decoded content: ', decode(entry, 0));
-            }
-        }
-    }
-
-    /*console.log('log Entries: ', r.logEntries)
-
-    for (let index in r.logEntries) {
-        if (r.logEntries[index]) {
-            console.log('decoded content: ', decode(r.logEntries[index], 0));
-        }
-    }*/
 
     console.log(generateWantVector(getReplicas()))
 
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
-    setInterval(sendWantVector, 5000)
+    //setInterval(sendWantVector, 5000)
     //sendWantVector()
-
-    // Start worker-Thread, which sends Want-Vector periodically
-    //const p2pworker = new Worker('p2pworker.js')
-    //p2pworker.postMessage()
 }
 
 window.addEventListener('DOMContentLoaded', main)
@@ -1164,10 +1125,7 @@ function sendWantVector() {
         console.log('\n')
         console.log(JSON.parse(Buffer.from(JSON.stringify(wantVec)).toString()))*/
 
-        //sendP2P(wantVec)
-        //var buf = allocAndEncode('test')
-        var trem = Buffer.from(JSON.stringify(tremola))
-        cats.emit('mew', trem)
+        sendP2P(wantVec)
 
         // For testing receive() method:
         var artificialWantVec = {
@@ -1179,7 +1137,27 @@ function sendWantVector() {
             }
         };
 
+        var artificialLogEntry = {
+            header:
+                {
+                    tst: 1715331507689,
+                    ref: 477188,
+                    fid: '@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519'
+                },
+            confid: {},
+            public: [ 'TAV', 'testX', null, 1715331507689, undefined ]
+        }
+        var artificialDataVec = {
+            type:'d',
+            content: {
+                fid:'@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519',
+                seqNr:9,
+                entry:allocAndEncode(artificialLogEntry)
+            }
+        };
+
         receiveP2P(artificialWantVec)
+        receiveP2P(artificialDataVec)
     } catch (err) {
         console.error('Error when sending want-vector: ', err)
     }
@@ -1201,15 +1179,16 @@ async function initP2P() {
     try {
         //
 // Create (or read from storage) a peer ID and a key-pair for signing.
+        const uuid = '6e400001-7646-4b5b-9a50-71becce51558'
 //
-        const peerId = await Encryption.createId()
-        const signingKeys = await Encryption.createKeyPair()
+        const peerId = await Encryption.createId(uuid)
+        const signingKeys = await Encryption.createKeyPair(uuid)
 
 //
 // Create (or read from storage) a clusterID and a symmetrical/shared key.
 //
-        const clusterId = await Encryption.createClusterId('6e400001-7646-4b5b-9a50-71becce51558')
-        const sharedKey = await Encryption.createSharedKey('6e400001-7646-4b5b-9a50-71becce51558')
+        const clusterId = await Encryption.createClusterId(uuid)
+        const sharedKey = await Encryption.createSharedKey(uuid)
 
 //
 // Create a socket that can send a receive network events. The clusterId
@@ -1267,6 +1246,7 @@ async function receiveP2P(vector) {
                     const entryToSend = replicas[fid].logEntries[desiredEntry -1]
                     const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:entryToSend } };
                     //TODO: send dataVec over P2P!!
+                    sendP2P(dataVec)
 
                     console.log('send data packet with number: ', desiredEntry)
                     console.log('data vector to send: ', dataVec)
@@ -1278,7 +1258,7 @@ async function receiveP2P(vector) {
         });
 
         // If we are here, we have not found a fitting entry
-        console.log('no fitting entry found; either we dont have the fid or we dont have a new package')
+        console.log('no fitting entry found; either we dont have the fid or we dont have a new packet')
     } else if (vector.type == 'd') {
         //TODO: append new log entry to file system, if seq.Nr. is matching...
         console.log('vector is a data vector')
@@ -1291,9 +1271,13 @@ async function receiveP2P(vector) {
             // Append only if seqNr matches exactly!!
             if (vector.content.seqNr === currSeqNr + 1) {
                 await appendContent(r, vector.content.entry)
+                console.log('appending logEntry to fid: ', vector.content.fid)
+            } else {
+                console.log('not appending logEntry because Seq.Nr. is not matching!')
             }
         } else {
             // do nothing, as we don't have the fid in our replica object / content list...
+            console.log('vector not appended, because no matching FID was found!')
         }
     } else {
         console.error('vector is of unkonwn format')
@@ -1303,8 +1287,8 @@ async function receiveP2P(vector) {
 export function sendP2P(msg) {
     try {
         if (msg != null) {
-            cats.emit('mew', msg)
-            console.log('msg emitted into P2P network: ', msg)
+            cats.emit('mew', Buffer.from(JSON.stringify(msg)))
+            console.log('msg emitted into P2P network: ', Buffer.from(JSON.stringify(msg)))
         } else {
             console.log('msg length is 0 !!')
         }
@@ -1407,7 +1391,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         //console.log(e)
     } else if (cmdStr[0] == 'restream') {
         //console.log('Tremola object: ', tremola)
-        await restreamChats()
+        await restreamAllLogs()
     }
 
     else {
@@ -1415,21 +1399,29 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     }
 }
 
-async function restreamChats() {
-    // delete all the chats
-    document.getElementById('lst:chats').innerHTML = '';
+async function restreamAllLogs() {
 
-    //TODO: is it enough to rely on the local Replicas, or should I also
-    //TODO: read the content from the files again and generate 'fresh' replica objects?
-    delReplicas()
-    // After the replicas are deleted; create new replica objects for all contacts like in main()
-    for (var contact in tremola.contacts) {
-        console.log('contact:', contact)
+    // delete local replica objects
+    delRepo()
 
-        await createReplica(contact)
-        var r = await fid2replica(contact)
+    // load everything again from the file system (source of "truth")
+    await loadRepo()
+    var fidlist = listFeeds()
+    console.log(fidlist)
+
+    for (const fid of fidlist) {
+        // Check if the filename ends with '.log'
+        if (fid.endsWith('.log')) {
+            // Remove the '.log' extension to get the Feed ID (fid)
+            const feedID = fid.slice(0, -4);
+
+            await createReplica(feedID);
+            await fid2replica(feedID);
+        }
+        // If the file does not end with '.log', it is ignored
     }
 
+    // send all entries back to the frontend as new events
     for (const [key, value] of Object.entries(getReplicas())) {
         const r = value;
         //console.log('replica key: ', key);
@@ -1444,10 +1436,10 @@ async function restreamChats() {
         }
     }
 
-    // new_text_post(document.getElementById('draft').value);
+    //console.log('Replicas after restreaming: ', getReplicas())
 }
 
-function resetTremola() { // wipes browser-side content
+export function resetTremola() { // wipes browser-side content
     tremola = {
         "chats": {},
         "contacts": {},
@@ -1497,6 +1489,8 @@ function testBipfEncoding() {
 
     // Allocate and encode a correctly sized buffer
     var buffer = allocAndEncode(tremola);
+    console.log('Encoded buffer: ', buffer)
+    console.log('Buffer length: ', buffer.length)
 
     // Parse entire object and read a single value
     console.log(decode(buffer, 0).id);
