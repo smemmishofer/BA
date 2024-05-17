@@ -63,11 +63,6 @@ const username = process.env.USERNAME
 
 export var tremola;
 //window.localStorage.setItem(`tremola${process.env.USERNAME}`, JSON.stringify(tremola));
-if(username) {
-    tremola = window.localStorage.getItem(`tremola${username}`)
-} else {
-    tremola = window.localStorage.getItem(`tremola`)
-}
 //export var tremola;
 export var curr_chat;
 export var qr;
@@ -1061,6 +1056,15 @@ if (process.platform === 'mac') {
 
 async function main () {
     //findAndRemoveTremolaItems();
+    if(username) {
+        tremola = window.localStorage.getItem(`tremola${username}`)
+    } else {
+        tremola = window.localStorage.getItem(`tremola`)
+    }
+    console.log(`Tremola object: tremola${username}`)
+
+    //console.log('Tremola local var: ', tremola)
+    //console.log('Tremola Object: ', tremola)
 
     console.log('Current Platform: ', process.platform)
     //console.log('Documents Path: ', path.DOCUMENTS)
@@ -1070,12 +1074,11 @@ async function main () {
     initP2P().then(() => {
         try {
             cats.on('mew', buf => {
-                //console.log('before json decoding: ', buf)
-                console.log('p2p msg received:')
                 var string = new TextDecoder().decode(buf.data);
-                console.log('decoded string: ', string)
-                console.log('Received new P2P message: ', JSON.parse(string))
+                var vector = JSON.parse(string)
+                console.log('Received new P2P message: ', vector)
                 //TODO: Call receiveP2P() method here with the decoded string (want-or data-vector) !!!
+                receiveP2P(vector)
             })
         } catch (err) {
             console.error(err)
@@ -1117,7 +1120,7 @@ async function main () {
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
     //TODO: comment here to get P2P functionality to work
-    //setInterval(sendWantVector, 5000)
+    //setInterval(sendWantVector, 10000)
     //sendWantVector()
 }
 
@@ -1393,7 +1396,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
 
         //TODO: hier wieder einkommentieren!!
         b2f_new_event(e)
-        sendP2P(e.public)
+        //sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
         if (prev != "null") {
@@ -1906,15 +1909,24 @@ function b2f_initialize(id) {
         id = '@CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=.ed25519'
     }
 
+    let tremolaObject = 'tremola'
+    if(username) {
+        tremolaObject = `tremola${username}`
+    }
+
+    //console.log('tremolaObject localStorage: ', window.localStorage.tremolaObject)
+
     myId = id
-    if (window.localStorage.tremola) {
-        tremola = JSON.parse(window.localStorage.getItem('tremola'));
+    if (window.localStorage.getItem(tremolaObject) !== null) {
+        tremola = JSON.parse(window.localStorage.getItem(tremolaObject));
+        console.log('tremola in if-part: ', tremola)
 
         if (tremola != null && id != tremola.id) // check for clash of IDs, erase old state if new
             tremola = null;
     } else
         tremola = null;
     if (tremola == null) {
+        console.log('tremola when initializing: ', tremola)
         resetTremola();
         console.log("reset tremola")
     }
