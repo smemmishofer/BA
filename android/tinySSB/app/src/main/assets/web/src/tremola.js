@@ -58,7 +58,17 @@ import {Encryption, network} from "socket:network";
 import {createBoard} from "./board.js";
 import {Timeline} from "./scuttlesort.js";
 
+
+const username = process.env.USERNAME
+
 export var tremola;
+//window.localStorage.setItem(`tremola${process.env.USERNAME}`, JSON.stringify(tremola));
+if(username) {
+    tremola = window.localStorage.getItem(`tremola${username}`)
+} else {
+    tremola = window.localStorage.getItem(`tremola`)
+}
+//export var tremola;
 export var curr_chat;
 export var qr;
 export function setQrVar(value) {
@@ -1050,7 +1060,7 @@ if (process.platform === 'mac') {
 }
 
 async function main () {
-    //window.localStorage.removeItem("tremola");
+    //findAndRemoveTremolaItems();
 
     console.log('Current Platform: ', process.platform)
     //console.log('Documents Path: ', path.DOCUMENTS)
@@ -1112,6 +1122,26 @@ async function main () {
 }
 
 window.addEventListener('DOMContentLoaded', main)
+
+// intermediary method used to clear window.localStorage elements
+function findAndRemoveTremolaItems() {
+
+    const prefix = `tremola`;
+
+    // Iterate over all keys in localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+
+        // Check if the key starts with the prefix
+        if (key.startsWith(prefix)) {
+            console.log(`Found item: ${key}`);
+
+            // Remove the item
+            localStorage.removeItem(key);
+            console.log(`Removed item: ${key}`);
+        }
+    }
+}
 
 function sendWantVector() {
     try {
@@ -1401,6 +1431,8 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         //TODO: Maybe change the ID here??
         b2f_initialize(process.env.USERNAME)
         await restreamAllLogs()
+    } else if (cmdStr[0] === 'add:contact') {
+        console.log('adding contact: ...')
     }
 
     else {
@@ -1870,7 +1902,10 @@ function b2f_initialize(id) {
         id = '@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519'
     } else if (id === 'Bob') {
         id = '@BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=.ed25519'
+    } else {
+        id = '@CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=.ed25519'
     }
+
     myId = id
     if (window.localStorage.tremola) {
         tremola = JSON.parse(window.localStorage.getItem('tremola'));
