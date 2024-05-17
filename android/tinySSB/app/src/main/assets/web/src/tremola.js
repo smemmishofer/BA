@@ -1072,40 +1072,34 @@ async function main () {
         }
     })
 
-    //clearAllPersistedData()
-    if (process.platform == 'ios') {
+    if (process.platform === 'ios') {
         adjustFormatToIOS()
     }
 
     initializeAllButtons()
 
-    //testBipfEncoding()
-    //bipfTest2()
+    delRepo()
+    // load everything again from the file system (source of "truth")
+    await loadRepo()
+    var fidlist = listFeeds()
+    console.log(fidlist)
 
-    //console.log('Tremola ID: ', tremola.id)
+    for (const fid of fidlist) {
+        await createReplica(fid);
+        await fid2replica(fid);
+    }
 
     for (var contact in tremola.contacts) {
         console.log('contact:', contact)
-
-        await createReplica(contact)
-        await fid2replica(contact)
-
         tremola.contacts[contact].forgotten = false
     }
-
-    loadRepo()
-        .then(() => {
-            console.log('successfully loaded files')
-            //console.log(listFeeds())
-        })
-        .catch(error => console.log('Error loading Repo'))
 
     console.log(generateWantVector(getReplicas()))
 
     // Test passing command line arguments via environment variables:
-    console.log('KEY environment variable: ', process.env.KEY)
-    if (process.env.KEY != null) {
-        console.log('KEY: ', process.env.KEY)
+    console.log('KEY environment variable: ', process.env.USERNAME)
+    if (process.env.USERNAME != null) {
+        console.log('KEY: ', process.env.USERNAME)
     } else {
         console.log('KEY is not defined ...')
     }
@@ -1176,6 +1170,8 @@ function sendWantVector() {
 function adjustFormatToIOS() {
     console.log('Adjusting format to ios')
 
+    var e = document.getElementById('main_division')
+    e.style.marginTop = '200px'
     // TODO!!!
 }
 
@@ -1313,7 +1309,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     }
     cmdStr = cmdStr.split(' ')
     if (cmdStr[0] == 'ready')
-        b2f_initialize('@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519')
+        b2f_initialize(process.env.USERNAME)
     else if (cmdStr[0] == 'exportSecret')
         b2f_showSecret('secret_of_id_which_is@AAAA==.ed25519')
     else if (cmdStr[0] == "wipe") {
@@ -1403,7 +1399,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     } else if (cmdStr[0] === 'reset') {
         //console.log('Backend reset ...')
         //TODO: Maybe change the ID here??
-        b2f_initialize('@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519')
+        b2f_initialize(process.env.USERNAME)
         await restreamAllLogs()
     }
 
@@ -1423,15 +1419,8 @@ async function restreamAllLogs() {
     console.log(fidlist)
 
     for (const fid of fidlist) {
-        // Check if the filename ends with '.log'
-        if (fid.endsWith('.log')) {
-            // Remove the '.log' extension to get the Feed ID (fid)
-            const feedID = fid.slice(0, -4);
-
-            await createReplica(feedID);
-            await fid2replica(feedID);
-        }
-        // If the file does not end with '.log', it is ignored
+        await createReplica(fid);
+        await fid2replica(fid);
     }
 
     // send all entries back to the frontend as new events
@@ -1483,7 +1472,7 @@ export function resetTremola() { // wipes browser-side content
 
 export function persist() {
     console.log('Data saved persistently');
-    window.localStorage.setItem(`tremola${process.env.KEY}`, JSON.stringify(tremola));
+    window.localStorage.setItem(`tremola${process.env.USERNAME}`, JSON.stringify(tremola));
     //window.localStorage.removeItem("tremola");
     //await testBipfEncoding()
 }
@@ -1877,6 +1866,11 @@ function b2f_new_image_blob(ref) {
 }
 
 function b2f_initialize(id) {
+    if (id === 'Alice') {
+        id = '@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519'
+    } else if (id === 'Bob') {
+        id = '@BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=.ed25519'
+    }
     myId = id
     if (window.localStorage.tremola) {
         tremola = JSON.parse(window.localStorage.getItem('tremola'));

@@ -7,11 +7,11 @@ var fidlist = [];
 var replicas = {};
 
 // User should be given via the environment variable; else the path defaults to /repo
-const key = process.env.KEY
+const username = process.env.USERNAME
 
 let repoPath;
-if(key) {
-  repoPath = path.join(path.DOCUMENTS, 'repo', key)
+if(username) {
+  repoPath = path.join(path.DOCUMENTS, 'repo', username)
 } else {
   repoPath = path.join(path.DOCUMENTS, 'repo')
 }
@@ -40,8 +40,12 @@ export async function loadRepo() {
   try {
     const dir = await fs.opendir(repoPath)
     for await (const dirent of dir) {
-      if (dirent.isFile() && !ignoredFiles.includes(dirent.name)) {
-        fidlist.push(dirent.name)
+      // check, if it's a log file (ends with .log; and if it's in the ignored files)
+      if (dirent.isFile() && !ignoredFiles.includes(dirent.name) && dirent.name.endsWith('.log')) {
+        // .slice(0, -4) removes the .log from the end; such that only the fid's are remaining
+        fidlist.push(dirent.name.slice(0, -4))
+        console.log('dirent: ', dirent)
+        console.log('push: ', dirent.name.slice(0, -4))
       }
     }
     //console.log('fidlist: ', fidlist)
