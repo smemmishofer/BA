@@ -1305,7 +1305,7 @@ async function receiveP2P(vector) {
                     // -1, because logEntries is an array and if it has 1 element, we want the one at pos. 0
                     // TODO: Test, ob sequenznummern stimmen!
                     const entryToSend = replicas[fid].logEntries[desiredEntry -1]
-                    const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:entryToSend } };
+                    const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:decode(entryToSend, 0) } };
                     //TODO: send dataVec over P2P!!
                     let port;
                     if (process.env.USERNAME === 'Alice') {
@@ -1355,8 +1355,9 @@ async function receiveP2P(vector) {
 
             // Append only if seqNr matches exactly!!
             if (vector.content.seqNr === currSeqNr + 1) {
-                console.log(vector.content.entry)
-                await appendContent(r, vector.content.entry)
+                console.log('raw data: ', vector.content.entry)
+                var ebipf = allocAndEncode(vector.content.entry)
+                await appendContent(r, ebipf)
                 console.log('appending logEntry to fid: ', vector.content.fid)
             } else {
                 console.log('not appending logEntry because Seq.Nr. is not matching!')
