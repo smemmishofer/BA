@@ -536,9 +536,18 @@ async function load_chat_item(nm) { // appends a button for conversation with na
     // item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
     item.setAttribute('class', 'chat_item_div'); // old JS (SDK 23)
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
+
+    //TODO: Adjust format some more here...
+    let fontsize;
+    if (process.platform === 'ios') {
+        fontsize = +7
+    } else {
+        fontsize = -2
+    }
+
     row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
-    row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
+    row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size='" + fontsize + "'>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
     badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: small; line-height:2em;'>&gt;9</div>";
     row += badge + "</button>";
@@ -1225,7 +1234,42 @@ function adjustFormatToIOS() {
     console.log('Adjusting format to ios')
 
     var e = document.getElementById('main_division')
-    e.style.marginTop = '200px'
+    e.style.marginTop = '150px'
+
+    var e = document.getElementById('menu')
+    e.style.marginTop = '150px'
+
+    var e = document.getElementById('btn:menu')
+    var fontElement = e.querySelector('font');
+    fontElement.style.fontSize = '60px'
+
+    var e = document.getElementById('div:qr')
+    var fontElement = e.querySelector('font');
+    fontElement.style.fontSize = '60px'
+
+    var e = document.getElementById('tremolaTitle')
+    var fontElement = e.querySelector('font');
+    fontElement.style.fontSize = '60px'
+
+    var e = document.getElementById('div:back')
+    e.style.height = '60px'
+    e.style.width = '60px'
+
+    var e = document.getElementById('back')
+    e.style.height = '60px'
+    e.style.width = '60px'
+
+    var e = document.getElementById('hdr')
+    e.style.height = '75px'
+
+    var e = document.getElementById('conversationTitle')
+    e.style.fontSize = '30px'
+
+    // var e = document.getElementById('chat')
+    // e.style.fontSize = '150px'
+
+    // var e = document.getElementById('core')
+    // e.style.fontSize = '60px'
     // TODO!!!
 }
 

@@ -17,6 +17,7 @@ import {close_board_context_menu, display_create_personal_board, menu_create_per
 import {getSetting} from "./tremola_settings.js";
 import {setCurrItem} from "./board.js";
 import {QRCode} from "./qrcode.js";
+import process from "socket:process";
 
 var overlayIsActive = false;
 
@@ -214,7 +215,11 @@ export function btnBridge(e) {
         document.getElementById("menu").style.display = 'initial';
         document.getElementById("overlay-trans").style.display = 'initial';
         scenarioMenu[curr_scenario].forEach(function (e) {
-            m += "<button class=menu_item_button ";
+            if (process.platform === 'ios') {
+                m += "<button class=menu_item_button style='font-size: 40px; padding: 10px;' ";
+            } else {
+                m += "<button class=menu_item_button ";
+            }
             m += "id='" + e[1] + "'>" + e[0] + "</button><br>";
         })
         m = m.substring(0, m.length - 4);
