@@ -51,12 +51,14 @@ import { decode } from './bipf/decode.js'
 import { allocAndEncode, encode } from "./bipf/encode.js";
 import { seekKey } from "./bipf/seekers.js";
 
+import {createBoard} from "./board.js";
+import {Timeline} from "./scuttlesort.js";
+
 // Changes for socket library
 import process from 'socket:process'
 import path from 'socket:path'
 import {Encryption, network} from "socket:network";
-import {createBoard} from "./board.js";
-import {Timeline} from "./scuttlesort.js";
+import { createSocket } from 'socket:dgram'
 
 
 const username = process.env.USERNAME
@@ -1054,6 +1056,7 @@ if (process.platform === 'mac') {
     // run some very specific code for mac
 }
 
+let websocket;
 async function main () {
     //findAndRemoveTremolaItems();
     if(username) {
@@ -1062,6 +1065,29 @@ async function main () {
         tremola = window.localStorage.getItem(`tremola`)
     }
     console.log(`Tremola object: tremola${username}`)
+
+    // try communication over websocket
+    const mode = process.env.MODE
+    if (mode === 'web') {
+        websocket = createSocket('udp4')
+
+        if(username === 'Alice') {
+            websocket.bind(50000, '0.0.0.0', () => console.log('Binding complete'))
+        } else if (username === 'Bob') {
+            websocket.bind(50001, '0.0.0.0', () => console.log('Binding complete'))
+        }
+        websocket.on('message', (msg, rinfo) => {
+            console.log('decoding message...')
+            var string = new TextDecoder().decode(msg);
+            var vector = JSON.parse(string)
+            console.log('Received new P2P message: ', vector)
+            receiveP2P(vector)
+        })
+        websocket.on('error', (err) => {
+            console.error('UDP socket error:', err);
+            websocket.close();
+        });
+    }
 
     //console.log('Tremola local var: ', tremola)
     //console.log('Tremola Object: ', tremola)
@@ -1074,8 +1100,10 @@ async function main () {
     initP2P().then(() => {
         try {
             cats.on('mew', buf => {
+                //console.log('before decoding text: ', buf)
                 var string = new TextDecoder().decode(buf.data);
                 var vector = JSON.parse(string)
+                //console.log('Received P2P before decoding: ', string)
                 console.log('Received new P2P message: ', vector)
                 //TODO: Call receiveP2P() method here with the decoded string (want-or data-vector) !!!
                 receiveP2P(vector)
@@ -1120,7 +1148,9 @@ async function main () {
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
     //TODO: comment here to get P2P functionality to work
-    //setInterval(sendWantVector, 10000)
+    if (process.env.USERNAME === 'Bob') {
+        setInterval(sendWantVector, 10000)
+    }
     //sendWantVector()
 }
 
@@ -1160,39 +1190,30 @@ function sendWantVector() {
         console.log('\n')
         console.log(JSON.parse(Buffer.from(JSON.stringify(wantVec)).toString()))*/
 
-        sendP2P(wantVec)
-
-        // For testing receive() method:
-        var artificialWantVec = {
-            type: 'v',
-            content: {
-                '@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519': 5,
-                '@BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=.ed25519': 1,
-                '@CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=.ed25519': 1
-            }
-        };
-
-        var artificialLogEntry = {
-            header:
-                {
-                    tst: 1715331507689,
-                    ref: 477188,
-                    fid: '@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519'
-                },
-            confid: {},
-            public: [ 'TAV', 'testX', null, 1715331507689, undefined ]
+        let port;
+        if (process.env.USERNAME === 'Alice') {
+            port = 50001
+        } else if (process.env.USERNAME === 'Bob') {
+            port = 50000
         }
-        var artificialDataVec = {
-            type:'d',
-            content: {
-                fid:'@AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=.ed25519',
-                seqNr:9,
-                entry:allocAndEncode(artificialLogEntry)
+        var msg = Buffer.from(JSON.stringify(wantVec))
+        if (process.env.MODE === 'web') {
+            try {
+                websocket.send(msg, port, '127.0.0.1', (err) => {
+                    if (err) {
+                        console.error('Error sending message:', err);
+                        websocket.close();
+                        console.log('Socket got closed...');
+                    } else {
+                        console.log('Message sent:', msg);
+                    }
+                });
+            } catch (err) {
+                console.error(err)
             }
-        };
-
-        // receiveP2P(artificialWantVec)
-        // receiveP2P(artificialDataVec)
+        } else {
+            sendP2P(wantVec)
+        }
     } catch (err) {
         console.error('Error when sending want-vector: ', err)
     }
@@ -1269,9 +1290,12 @@ async function receiveP2P(vector) {
         console.log('vector is a want vector')
         var fidSeqNrMap = vector.content
         var replicas = getReplicas()
+        console.log('replicas: ', replicas)
 
-        Object.keys(fidSeqNrMap).forEach(fid => {
+        for (const fid of Object.keys(fidSeqNrMap)) {
+            console.log('vector v, fid: ', fid)
             const desiredEntry = fidSeqNrMap[fid];
+            console.log('desired entry: ', desiredEntry);
             // +1, because we want to get back 1 entry later
             if (fid in replicas) {
                 var mostRecentEntry = replicas[fid].logEntries.length
@@ -1283,7 +1307,30 @@ async function receiveP2P(vector) {
                     const entryToSend = replicas[fid].logEntries[desiredEntry -1]
                     const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:entryToSend } };
                     //TODO: send dataVec over P2P!!
-                    sendP2P(dataVec)
+                    let port;
+                    if (process.env.USERNAME === 'Alice') {
+                        port = 50001
+                    } else if (process.env.USERNAME === 'Bob') {
+                        port = 50000
+                    }
+                    var msg = Buffer.from(JSON.stringify(dataVec))
+                    if (process.env.MODE === 'web') {
+                        try {
+                            websocket.send(msg, port, '127.0.0.1', (err) => {
+                                if (err) {
+                                    console.error('Error sending message:', err);
+                                    websocket.close();
+                                    console.log('Socket got closed...');
+                                } else {
+                                    console.log('Message sent:', msg);
+                                }
+                            });
+                        } catch (err) {
+                            console.error(err)
+                        }
+                    } else {
+                        sendP2P(dataVec)
+                    }
 
                     console.log('send data packet with number: ', desiredEntry)
                     console.log('data vector to send: ', dataVec)
@@ -1292,7 +1339,7 @@ async function receiveP2P(vector) {
                     return;
                 }
             }
-        });
+        }
 
         // If we are here, we have not found a fitting entry
         console.log('no fitting entry found; either we dont have the fid or we dont have a new packet')
@@ -1304,9 +1351,11 @@ async function receiveP2P(vector) {
         if (vector.content.fid in replicas) {
             var r = replicas[vector.content.fid]
             var currSeqNr = r.logEntries.length
+            console.log('FID from Data vector found in file system')
 
             // Append only if seqNr matches exactly!!
             if (vector.content.seqNr === currSeqNr + 1) {
+                console.log(vector.content.entry)
                 await appendContent(r, vector.content.entry)
                 console.log('appending logEntry to fid: ', vector.content.fid)
             } else {
