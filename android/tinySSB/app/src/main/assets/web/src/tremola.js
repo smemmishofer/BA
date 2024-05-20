@@ -1139,6 +1139,7 @@ async function main () {
         try {
             cats.on('mew', buf => {
                 //console.log('before decoding text: ', buf)
+
                 var string = new TextDecoder().decode(buf.data);
                 var vector = JSON.parse(string)
                 //console.log('Received P2P before decoding: ', string)
@@ -1190,7 +1191,7 @@ async function main () {
         setInterval(sendWantVector, 10000)
     }*/
     if (process.platform !== 'ios') {
-        setInterval(sendWantVector, 10000)
+        setInterval(sendWantVector, 3000)
     }
     //sendWantVector()
 }
@@ -1302,12 +1303,12 @@ function adjustFormatToIOS() {
 
     var e = document.getElementById('draft')
     var f = document.getElementById('core')
-    f.style.marginBottom = '0px'
+    f.style.marginBottom = '-100px'
     e.addEventListener('focus', function() {
         f.style.marginBottom = '-890px'
     })
     e.addEventListener('blur', function() {
-        f.style.marginBottom = '0px'
+        f.style.marginBottom = '-100px'
     })
 
     // var e = document.getElementById('core')

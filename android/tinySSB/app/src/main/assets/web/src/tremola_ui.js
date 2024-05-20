@@ -164,19 +164,6 @@ export function setScenario(s) {
             document.getElementById('tremolaTitle').style.position = null;
         }
 
-        /*if (s == "posts") {
-            console.log('displaying posts...')
-            if (process.platform === 'ios') {
-                var e = document.getElementById('core')
-                e.style.marginBottom = '-400px'
-            }
-        } else {
-            if (process.platform === 'ios') {
-                var e = document.getElementById('core')
-                e.style.marginBottom = '0px'
-            }
-        }*/
-
         if (s == "posts" || s == "settings" || s == "board") {
             document.getElementById('tremolaTitle').style.display = 'none';
             document.getElementById('conversationTitle').style.display = null;
