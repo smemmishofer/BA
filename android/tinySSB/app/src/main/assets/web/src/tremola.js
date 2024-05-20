@@ -539,20 +539,27 @@ async function load_chat_item(nm) { // appends a button for conversation with na
 
     //TODO: Adjust format some more here...
     let fontsize;
+    let font;
     if (process.platform === 'ios') {
         fontsize = +7
+        font = 'large'
     } else {
         fontsize = -2
+        font = 'small'
     }
 
     row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size='" + fontsize + "'>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
-    badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: small; line-height:2em;'>&gt;9</div>";
+    badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: " + font + "; line-height:2em;'>&gt;9</div>";
     row += badge + "</button>";
     row += ""
     item.innerHTML = row;
+    if (process.platform === 'ios') {
+        //item.setAttribute()
+    }
+
     cl.appendChild(item);
 
     // Get the newly created button element
@@ -1160,7 +1167,9 @@ async function main () {
     /*if (process.env.USERNAME === 'Bob') {
         setInterval(sendWantVector, 10000)
     }*/
-    setInterval(sendWantVector, 10000)
+    if (process.platform !== 'ios') {
+        setInterval(sendWantVector, 10000)
+    }
     //sendWantVector()
 }
 
@@ -1440,7 +1449,12 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     }
     cmdStr = cmdStr.split(' ')
     if (cmdStr[0] == 'ready')
-        b2f_initialize(process.env.USERNAME)
+        if (process.env.USERNAME) {
+            b2f_initialize(process.env.USERNAME)
+        } else {
+            b2f_initialize('@CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=.ed25519')
+            console.log('initializing with default username, since no USERNAME was provided...')
+        }
     else if (cmdStr[0] == 'exportSecret')
         b2f_showSecret('secret_of_id_which_is@AAAA==.ed25519')
     else if (cmdStr[0] == "wipe") {
@@ -1467,6 +1481,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         // Kriegen Byte-Array zurück; daraus gleich wieder lesen/ bezw. von BIPF zurück konvertieren.
 
         var ebipf = allocAndEncode(e)
+        await createReplica(tremola.id)
         var r = await fid2replica(tremola.id)
         //if(replicas)
             //TODO: Continue here
@@ -1530,7 +1545,12 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     } else if (cmdStr[0] === 'reset') {
         //console.log('Backend reset ...')
         //TODO: Maybe change the ID here??
-        b2f_initialize(process.env.USERNAME)
+        if (process.env.USERNAME) {
+            b2f_initialize(process.env.USERNAME)
+        } else {
+            b2f_initialize('@CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=.ed25519')
+            console.log('initializing with default username, since no USERNAME was provided...')
+        }
         await restreamAllLogs()
     } else if (cmdStr[0] === 'add:contact') {
         console.log('adding contact: ...')
@@ -1605,7 +1625,12 @@ export function resetTremola() { // wipes browser-side content
 
 export function persist() {
     console.log('Data saved persistently');
-    window.localStorage.setItem(`tremola${process.env.USERNAME}`, JSON.stringify(tremola));
+    //window.localStorage.setItem(`tremola${process.env.USERNAME}`, JSON.stringify(tremola));
+    if (process.env.USERNAME) {
+        window.localStorage.setItem(`tremola${process.env.USERNAME}`, JSON.stringify(tremola));
+    } else {
+        window.localStorage.setItem(`tremola`, JSON.stringify(tremola));
+    }
     //window.localStorage.removeItem("tremola");
     //await testBipfEncoding()
 }
