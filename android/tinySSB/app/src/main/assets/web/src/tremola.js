@@ -1297,11 +1297,27 @@ function adjustFormatToIOS() {
     var e = document.getElementById('conversationTitle')
     e.style.fontSize = '30px'
 
-    // var e = document.getElementById('chat')
-    // e.style.fontSize = '150px'
+    var e = document.getElementById('draft')
+    e.style.fontSize = '40px'
+
+    var e = document.getElementById('draft')
+    var f = document.getElementById('core')
+    f.style.marginBottom = '0px'
+    e.addEventListener('focus', function() {
+        f.style.marginBottom = '-890px'
+    })
+    e.addEventListener('blur', function() {
+        f.style.marginBottom = '0px'
+    })
 
     // var e = document.getElementById('core')
-    // e.style.fontSize = '60px'
+    // e.style.marginBottom = '-200px'
+
+    // var e = document.getElementById('div:footer')
+    // e.style.marginBottom = '300px'
+    //
+    // var e = document.getElementById('main_division')
+    // e.style.marginBottom = '300px'
     // TODO!!!
 }
 
