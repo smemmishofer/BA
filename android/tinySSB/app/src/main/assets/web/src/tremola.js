@@ -418,7 +418,18 @@ function new_image_post() {
 function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
     var pl = document.getElementById('lst:posts');
     var is_other = p["from"] != myId;
-    var box = "<div class=light style='padding: 3pt; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.7); word-break: break-word;'"
+
+    let fontSize;
+    let dateSize;
+    if (process.platform === 'ios') {
+        fontSize = '40px';  // Larger font size for iOS
+        dateSize = '20px';
+    } else {
+        fontSize = '16px';  // Default font size for other platforms
+        dateSize = '8px';
+    }
+
+    var box = "<div class=light style='padding: 3pt; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.7); word-break: break-word; font-size: " + fontSize + ";'";
     if (p.voice != null)
         box += " onclick='play_voice(\"" + curr_chat + "\", \"" + p.key + "\");'";
     box += ">"
@@ -438,7 +449,7 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     box += txt
     var d = new Date(p["when"]);
     d = d.toDateString() + ' ' + d.toTimeString().substring(0, 5);
-    box += "<div align=right style='font-size: x-small;'><i>";
+    box += "<div align=right style='font-size: " + dateSize + ";'><i>";
     box += d + "</i></div></div>";
     var row;
     if (is_other) {
@@ -535,30 +546,41 @@ async function load_chat_item(nm) { // appends a button for conversation with na
     item = document.createElement('div');
     // item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
     item.setAttribute('class', 'chat_item_div'); // old JS (SDK 23)
+    // if (process.platform === 'ios') {
+    //     item.style.height = '200px'
+    //     //item.style.width = '2em'
+    // }
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
 
     //TODO: Adjust format some more here...
     let fontsize;
     let font;
+    let height;
+    let textSize;
     if (process.platform === 'ios') {
-        fontsize = +7
+        fontsize = +5
         font = 'large'
+        height = '100px'
+        textSize = '40px';
     } else {
         fontsize = -2
         font = 'small'
+        height = '50px'
+        textSize = '15px';
     }
 
-    row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
-    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
+    row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative; height: " + height + ";'>";
+    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden; font-size: " + textSize + ";'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size='" + fontsize + "'>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
     badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: " + font + "; line-height:2em;'>&gt;9</div>";
     row += badge + "</button>";
     row += ""
+    // if (process.platform === 'ios') {
+    //     item.style.height = '200px'
+    //     //item.style.width = '2em'
+    // }
     item.innerHTML = row;
-    if (process.platform === 'ios') {
-        //item.setAttribute()
-    }
 
     cl.appendChild(item);
 
