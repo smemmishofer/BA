@@ -1157,9 +1157,10 @@ async function main () {
     // Send Want-Vector once every second.
     //TODO: Fix encoding/decoding want-Vector while sending over the newtork
     //TODO: comment here to get P2P functionality to work
-    if (process.env.USERNAME === 'Bob') {
+    /*if (process.env.USERNAME === 'Bob') {
         setInterval(sendWantVector, 10000)
-    }
+    }*/
+    setInterval(sendWantVector, 10000)
     //sendWantVector()
 }
 
@@ -1403,6 +1404,9 @@ async function receiveP2P(vector) {
                 var ebipf = allocAndEncode(vector.content.entry)
                 await appendContent(r, ebipf)
                 console.log('appending logEntry to fid: ', vector.content.fid)
+
+                // TODO: UI aktualisieren mit neuem Log-Eintrag...
+                b2f_new_event(vector.content.entry)
             } else {
                 console.log('not appending logEntry because Seq.Nr. is not matching!')
             }
