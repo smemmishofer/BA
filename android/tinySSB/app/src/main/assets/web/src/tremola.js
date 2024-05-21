@@ -1113,6 +1113,8 @@ async function main () {
             websocket.bind(50000, '0.0.0.0', () => console.log('Binding complete'))
         } else if (username === 'Bob') {
             websocket.bind(50001, '0.0.0.0', () => console.log('Binding complete'))
+        } else if (username === 'Charlie') {
+            websocket.bind(50002, '0.0.0.0', () => console.log('Binding complete'))
         }
         websocket.on('message', (msg, rinfo) => {
             console.log('decoding message...')
@@ -1190,9 +1192,10 @@ async function main () {
     /*if (process.env.USERNAME === 'Bob') {
         setInterval(sendWantVector, 10000)
     }*/
-    if (process.platform !== 'ios') {
+    /*if (process.platform !== 'ios') {
         setInterval(sendWantVector, 3000)
-    }
+    }*/
+    setInterval(sendWantVector, 6000)
     //sendWantVector()
 }
 
@@ -1236,18 +1239,32 @@ function sendWantVector() {
         if (process.env.USERNAME === 'Alice') {
             port = 50001
         } else if (process.env.USERNAME === 'Bob') {
-            port = 50000
+            // for iOS: send to Charlie
+            port = 50002
+        } else if (process.env.USERNAME === 'Charlie') {
+            // for iOS: send to Bob
+            port = 50001
         }
         var msg = Buffer.from(JSON.stringify(wantVec))
         if (process.env.MODE === 'web') {
+
+            // For testing communication between iOS and macOS
+            let ipadr = '127.0.0.1'
+
+            if (process.platform === 'ios') {
+                ipadr = '192.168.1.132'
+            } else if (process.platform === 'mac') {
+                ipadr = '192.168.1.130'
+            }
+
             try {
-                websocket.send(msg, port, '127.0.0.1', (err) => {
+                websocket.send(msg, port, ipadr, (err) => {
                     if (err) {
                         console.error('Error sending message:', err);
                         websocket.close();
                         console.log('Socket got closed...');
                     } else {
-                        console.log('Message sent:', msg);
+                        console.log('Message sent:', wantVec);
                     }
                 });
             } catch (err) {
@@ -1383,7 +1400,7 @@ async function receiveP2P(vector) {
         console.log('vector is a want vector')
         var fidSeqNrMap = vector.content
         var replicas = getReplicas()
-        console.log('replicas: ', replicas)
+        //console.log('replicas: ', replicas)
 
         for (const fid of Object.keys(fidSeqNrMap)) {
             console.log('vector v, fid: ', fid)
@@ -1404,18 +1421,31 @@ async function receiveP2P(vector) {
                     if (process.env.USERNAME === 'Alice') {
                         port = 50001
                     } else if (process.env.USERNAME === 'Bob') {
-                        port = 50000
+                        // for iOS: send to Charlie
+                        port = 50002
+                    } else if (process.env.USERNAME === 'Charlie') {
+                        // for iOS: send to Bob
+                        port = 50001
                     }
+
+                    let ipadr = '127.0.0.1'
+
+                    if (process.platform === 'ios') {
+                        ipadr = '192.168.1.132'
+                    } else if (process.platform === 'mac') {
+                        ipadr = '192.168.1.130'
+                    }
+
                     var msg = Buffer.from(JSON.stringify(dataVec))
                     if (process.env.MODE === 'web') {
                         try {
-                            websocket.send(msg, port, '127.0.0.1', (err) => {
+                            websocket.send(msg, port, ipadr, (err) => {
                                 if (err) {
                                     console.error('Error sending message:', err);
                                     websocket.close();
                                     console.log('Socket got closed...');
                                 } else {
-                                    console.log('Message sent:', msg);
+                                    //console.log('Message sent:', msg);
                                 }
                             });
                         } catch (err) {
@@ -1575,7 +1605,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
             'confid': {},
             'public': ["KAN", cmdStr[1], prev, cmdStr[3]].concat(args)
         }
-        // console.log('e=', JSON.stringify(e))
+        //console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
         //console.log(e)
     } else if (cmdStr[0] === 'restream') {
@@ -1995,6 +2025,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
             //if (getCurrScenario() == "chats") // the updated conversation could bubble up
             load_chat_list();
         } else if (e.public[0] == "KAN") { // Kanban board event
+            //TODO: b2f_new_in_order_event aufrufen... vom e...
         } else if (e.public[0] == "IAM") {
             var contact = tremola.contacts[e.header.fid]
             var old_iam = contact.iam
