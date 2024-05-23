@@ -11,9 +11,22 @@ import {
     escapeHTML,
     new_text_post,
     recps2display,
-    menu_new_contact, backend, assignMenuOnClick, localPeers, setQrVar, setNewContactID, getNewContactID, menu_edit
+    menu_new_contact,
+    backend,
+    assignMenuOnClick,
+    localPeers,
+    setQrVar,
+    setNewContactID,
+    getNewContactID,
+    menu_edit,
+    menu_new_conversation, menu_new_pub
 } from "./tremola.js";
-import {close_board_context_menu, display_create_personal_board, menu_create_personal_board} from "./board_ui.js";
+import {
+    close_board_context_menu,
+    display_create_personal_board,
+    menu_create_personal_board,
+    menu_new_board
+} from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
 import {setCurrItem} from "./board.js";
 import {QRCode} from "./qrcode.js";

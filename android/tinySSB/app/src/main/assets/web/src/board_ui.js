@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {fill_members, menu_edit, tremola} from "./tremola.js"
+import {escapeHTML, fill_members, menu_edit, persist, recps2display, tremola} from "./tremola.js"
 import {closeOverlay, setOverlayIsActive, setPrevScenario, setScenario} from "./tremola_ui.js";
 import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
 
@@ -114,7 +114,7 @@ export function load_board_list() {
     }
 }
 
-function ui_set_board_list_badge(bid) {
+export function ui_set_board_list_badge(bid) {
     var board = tremola.board[bid]
     var e = document.getElementById(bid + "-badge_board")
     var cnt
@@ -127,7 +127,7 @@ function ui_set_board_list_badge(bid) {
     e.innerHTML = cnt
 }
 
-function create_personal_board() {
+export function create_personal_board() {
     createBoard('Personal Board', [FLAG.PERSONAL])
 }
 
@@ -147,7 +147,7 @@ export function btn_create_personal_board_decline() {
     display_create_personal_board = false
 }
 
-function load_board(bid) { //switches scene to board and changes title to board name
+export function load_board(bid) { //switches scene to board and changes title to board name
     curr_board = bid
     var b = tremola.board[bid]
 
@@ -179,7 +179,7 @@ function load_board(bid) { //switches scene to board and changes title to board 
  * @param {string} bid - Id of the kanban board
  * @param {object} old_state - Previous snapshot of the kanban board
  */
-function ui_update_board(bid, old_state) {
+export function ui_update_board(bid, old_state) {
     var board = tremola.board[bid]
     console.log("DEBUG UPDATE")
 
@@ -263,7 +263,7 @@ function ui_update_board(bid, old_state) {
  * @param {Array} array2
  * @return {boolean} - Whether the two given arrays are equal
  */
-function equalArrays(array1, array2) {
+export function equalArrays(array1, array2) {
     if (array1.length != array2.length)
         return false
 
@@ -287,7 +287,7 @@ export function close_board_context_menu() {
     setCurrContextMenu(null)
 }
 
-function menu_history() {
+export function menu_history() {
     closeOverlay()
     document.getElementById('overlay-bg').style.display = 'initial';
     document.getElementById('menu_history_content').innerHTML = ''
@@ -314,7 +314,7 @@ function menu_history() {
     document.getElementById('div:menu_history').style.display = 'initial'
 }
 
-function history_sort_select(obj) {
+export function history_sort_select(obj) {
     var history = document.getElementById('menu_history_content')
     switch (obj.value) {
         case('latest_first'):
@@ -343,7 +343,7 @@ export function menu_board_invitations() {
 }
 
 // creates new entry in invitation (to accept or reject invitations) or updates existing entry
-function menu_board_invitation_create_entry(bid) {
+export function menu_board_invitation_create_entry(bid) {
 
     var board = tremola.board[bid]
 
@@ -386,7 +386,7 @@ function menu_board_invitation_create_entry(bid) {
     document.getElementById("kanban_invitations_list").innerHTML += invHTML
 }
 
-function btn_invite_accept(bid) {
+export function btn_invite_accept(bid) {
     inviteAccept(bid, tremola.board[bid].pendingInvitations[myId])
     delete tremola.board[bid].pendingInvitations[myId]
     var inv = document.getElementById("kanban_invitation_" + bid)
@@ -395,7 +395,7 @@ function btn_invite_accept(bid) {
         inv.outerHTML = ""
 }
 
-function btn_invite_decline(bid) {
+export function btn_invite_decline(bid) {
     inviteDecline(bid, tremola.board[bid].pendingInvitations[myId])
     delete tremola.board[bid].pendingInvitations[myId]
     var inv = document.getElementById("kanban_invitation_" + bid)
@@ -424,12 +424,12 @@ export function menu_new_board_name() {
     menu_edit('new_board', 'Enter the name of the new board', '')
 }
 
-function menu_rename_board() {
+export function menu_rename_board() {
     var board = tremola.board[curr_board]
     menu_edit('board_rename', 'Enter a new name for this board', board.name)
 }
 
-function ui_update_board_title(bid) {
+export function ui_update_board_title(bid) {
     var board = tremola.board[bid]
     // update board list
     load_board_list()
@@ -444,7 +444,7 @@ function ui_update_board_title(bid) {
     }
 }
 
-function board_toggle_forget() {
+export function board_toggle_forget() {
     var board = tremola.board[curr_board]
     board.forgotten = !board.forgotten
     persist()
@@ -453,7 +453,7 @@ function board_toggle_forget() {
     setScenario('kanban')
 }
 
-function menu_invite() {
+export function menu_invite() {
     var board = tremola.board[curr_board]
     closeOverlay()
 
@@ -473,7 +473,7 @@ function menu_invite() {
 }
 
 // adds an entry to the invite menu or updates an already existing entry
-function menu_invite_create_entry(id) {
+export function menu_invite_create_entry(id) {
     var board = tremola.board[curr_board]
 
     if (document.getElementById("div:invite_menu").style.display == 'none')
@@ -521,13 +521,13 @@ function menu_invite_create_entry(id) {
     document.getElementById("menu_invite_content").innerHTML += invHTML
 }
 
-function btn_invite(userId, bid) {
+export function btn_invite(userId, bid) {
     console.log("INVITE: " + userId + ", bid: " + bid)
     inviteUser(bid, userId)
     launch_snackbar("User invited")
 }
 
-function leave_curr_board() {
+export function leave_curr_board() {
     closeOverlay()
 
     if (tremola.board[curr_board].flags.includes(FLAG.PERSONAL)) {
@@ -542,11 +542,11 @@ function leave_curr_board() {
 /*
   Columns
 */
-function menu_new_column() {
+export function menu_new_column() {
     menu_edit("board_new_column", "Enter name of new List: ", "")
 }
 
-function load_column(columnID) {
+export function load_column(columnID) {
     var board = tremola.board[curr_board]
 
     if (document.getElementById(columnID + "-columnWrapper")) {
@@ -577,14 +577,14 @@ function load_column(columnID) {
 
 }
 
-function load_all_columns() {
+export function load_all_columns() {
     var board = tremola.board[curr_board]
     for (var i in board.columns) {
         load_column(i)
     }
 }
 
-function context_menu_column_options(columnID) {
+export function context_menu_column_options(columnID) {
     close_board_context_menu()
     document.getElementById("overlay-trans").style.display = 'initial';
     var context_menu = document.getElementById('context_options-' + columnID)
@@ -597,7 +597,7 @@ function context_menu_column_options(columnID) {
     setOverlayIsActive(true)
 }
 
-function contextmenu_move_column(columnID) {
+export function contextmenu_move_column(columnID) {
     document.getElementById('context_options-' + columnID).innerHTML = ''
     var board = tremola.board[curr_board]
     var availablePos = [];
@@ -614,17 +614,17 @@ function contextmenu_move_column(columnID) {
     document.getElementById('context_options-' + columnID).innerHTML = menuHTML
 }
 
-function menu_rename_column(columnID) {
+export function menu_rename_column(columnID) {
     curr_column = columnID
     menu_edit('board_rename_column', 'Enter new name: ', tremola.board[curr_board].columns[columnID].name)
 }
 
-function btn_remove_column(columnID) {
+export function btn_remove_column(columnID) {
     removeColumn(curr_board, columnID)
     closeOverlay()
 }
 
-function ui_rename_column(columnID, new_name) {
+export function ui_rename_column(columnID, new_name) {
     var wrapper = document.getElementById(columnID + '-columnWrapper')
 
     if (!wrapper) {
@@ -635,7 +635,7 @@ function ui_rename_column(columnID, new_name) {
     wrapper.getElementsByClassName('column_hdr')[0].getElementsByTagName('b')[0].innerHTML = new_name
 }
 
-function ui_remove_column(columnID) {
+export function ui_remove_column(columnID) {
     var board = tremola.board[curr_board]
 
     if (!document.getElementById(columnID + "-columnWrapper"))
@@ -643,7 +643,7 @@ function ui_remove_column(columnID) {
     document.getElementById(columnID + "-columnWrapper").outerHTML = "" //remove column from ui
 }
 
-function ui_move_column(columnID, insertPos) {
+export function ui_move_column(columnID, insertPos) {
     console.log('move', columnID, insertPos);
     closeOverlay()
     insertPos = parseInt(insertPos)
@@ -689,12 +689,12 @@ function ui_move_column(columnID, insertPos) {
   Items
 */
 
-function menu_create_item(columnID) {
+export function menu_create_item(columnID) {
     curr_column = columnID
     menu_edit('board_new_item', 'Enter name of new Card', '')
 }
 
-function load_item(itemID) {
+export function load_item(itemID) {
     var board = tremola.board[curr_board]
 
     var name = board.items[itemID].name
@@ -730,14 +730,14 @@ function load_item(itemID) {
     document.getElementById(itemID + "-item").addEventListener('mousedown', myTouchFct, false);
 }
 
-function load_all_items() {
+export function load_all_items() {
     var board = tremola.board[curr_board]
     for (var i in board.items) {
         load_item(i)
     }
 }
 
-function item_menu(itemID) {
+export function item_menu(itemID) {
     closeOverlay()
     curr_rename_item = itemID
     curr_item = itemID
@@ -794,7 +794,7 @@ function item_menu(itemID) {
     document.getElementById("div:item_menu_assignees").innerHTML = assigneesHTML
 }
 
-function item_menu_save_description() {
+export function item_menu_save_description() {
     var new_description = document.getElementById('div:item_menu_description_text').value
     var item = tremola.board[curr_board].items[curr_item]
 
@@ -806,7 +806,7 @@ function item_menu_save_description() {
     document.getElementById('btn:item_menu_description_cancel').style.display = 'none'
 }
 
-function item_menu_cancel_description() {
+export function item_menu_cancel_description() {
     document.getElementById('div:item_menu_description_text').style.border = 'none'
     document.getElementById('div:item_menu_description_text').value = tremola.board[curr_board].items[curr_item].description
     document.getElementById('btn:item_menu_description_save').style.display = 'none'
@@ -814,7 +814,7 @@ function item_menu_cancel_description() {
 }
 
 
-function contextmenu_change_column() {
+export function contextmenu_change_column() {
     close_board_context_menu()
     document.getElementById("overlay-trans").style.display = 'initial';
 
@@ -847,17 +847,17 @@ function contextmenu_change_column() {
     setOverlayIsActive(true)
 }
 
-function btn_move_item(item, new_column) {
+export function btn_move_item(item, new_column) {
     moveItem(curr_board, item, new_column)
     close_board_context_menu()
 }
 
-function btn_remove_item() {
+export function btn_remove_item() {
     removeItem(curr_board, curr_item)
     closeOverlay()
 }
 
-function contextmenu_item_change_position() {
+export function contextmenu_item_change_position() {
     close_board_context_menu()
 
     var board = tremola.board[curr_board]
@@ -888,7 +888,7 @@ function contextmenu_item_change_position() {
     setOverlayIsActive(true)
 }
 
-function contextmenu_item_assign() {
+export function contextmenu_item_assign() {
     close_board_context_menu()
     var board = tremola.board[curr_board]
 
@@ -914,7 +914,7 @@ function contextmenu_item_assign() {
     setOverlayIsActive(true)
 }
 
-function btn_post_comment() {
+export function btn_post_comment() {
     var comment = document.getElementById('item_menu_comment_text').value
     if (comment == '')
         return
@@ -927,7 +927,7 @@ function btn_rename_item() {
 
 }
 
-function ui_change_item_order(itemID, newPos) {
+export function ui_change_item_order(itemID, newPos) {
     close_board_context_menu()
     newPos = parseInt(newPos)
     var board = tremola.board[curr_board]
@@ -970,7 +970,7 @@ function ui_change_item_order(itemID, newPos) {
     persist()
 }
 
-function ui_remove_item(itemID) {
+export function ui_remove_item(itemID) {
     var board = tremola.board[curr_board]
     var column = board.columns[board.items[itemID].curr_column]
 
@@ -988,7 +988,7 @@ function ui_remove_item(itemID) {
     document.getElementById(itemID + '-item').outerHTML = ""
 }
 
-function ui_item_assign(fid) {
+export function ui_item_assign(fid) {
     //close_board_context_menu()
     var board = tremola.board[curr_board]
     var alreadyAssigned = board.items[curr_item].assignees.includes(fid)
@@ -999,7 +999,7 @@ function ui_item_assign(fid) {
         assignToItem(curr_board, curr_item, fid)
 }
 
-function ui_move_item(itemID, old_pos) {
+export function ui_move_item(itemID, old_pos) {
     var board = tremola.board[curr_board]
     var item = board.items[itemID]
     var old_column = board.columns[item.curr_column]
@@ -1012,7 +1012,7 @@ function ui_move_item(itemID, old_pos) {
     load_item(curr_op.body.cmd[1])
 }
 
-function contextmenu_change_color() {
+export function contextmenu_change_color() {
     close_board_context_menu()
     var board = tremola.board[curr_board]
     var item = board.items[curr_item]
@@ -1032,12 +1032,12 @@ function contextmenu_change_color() {
     setOverlayIsActive(true)
 }
 
-function btn_change_item_color(iid, color) {
+export function btn_change_item_color(iid, color) {
     close_board_context_menu()
     setItemColor(curr_board, iid, color)
 }
 
-function ui_update_item_name(itemID, new_name) {
+export function ui_update_item_name(itemID, new_name) {
     var hdr = document.getElementById(itemID + '-itemHdr')
 
     if (hdr) {
@@ -1056,7 +1056,7 @@ function ui_update_item_name(itemID, new_name) {
     }
 }
 
-function ui_update_item_color(itemID, new_color) {
+export function ui_update_item_color(itemID, new_color) {
     var hdr = document.getElementById(itemID + '-itemHdr')
 
     if (hdr) {
@@ -1077,7 +1077,7 @@ function ui_update_item_color(itemID, new_color) {
     }
 }
 
-function ui_update_item_description(itemID, new_descr) {
+export function ui_update_item_description(itemID, new_descr) {
     var itemDescr = document.getElementById(itemID + '-itemDescr')
 
 
@@ -1097,7 +1097,7 @@ function ui_update_item_description(itemID, new_descr) {
     }
 }
 
-function ui_update_item_assignees(itemID) {
+export function ui_update_item_assignees(itemID) {
     var board = tremola.board[curr_board]
     var item = board.items[itemID]
 
@@ -1135,7 +1135,7 @@ function ui_update_item_assignees(itemID) {
     }
 }
 
-function ui_item_update_chat(itemID) {
+export function ui_item_update_chat(itemID) {
     var board = tremola.board[curr_board]
     var item = board.items[itemID]
 
@@ -1162,7 +1162,7 @@ function ui_item_update_chat(itemID) {
     }
 }
 
-function ui_update_item_move_to_column(itemID, columnID, newPos) {
+export function ui_update_item_move_to_column(itemID, columnID, newPos) {
     var itemHTML = document.getElementById(itemID + "-item").outerHTML
     document.getElementById(itemID + "-item").outerHTML = ''
     document.getElementById(columnID + "-columnContent").innerHTML += itemHTML

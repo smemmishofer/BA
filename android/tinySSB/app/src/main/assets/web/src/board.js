@@ -2,8 +2,23 @@
 
 "use strict";
 
-import {backend, unicodeStringToTypedArray} from "./tremola.js";
-import {closeOverlay, getCurrScenario} from "./tremola_ui.js";
+import {backend, tremola, myId, unicodeStringToTypedArray, persist} from "./tremola.js";
+import {closeOverlay, getCurrScenario, launch_snackbar} from "./tremola_ui.js";
+import {Timeline} from "./scuttlesort.js";
+import {
+    load_board,
+    load_board_list,
+    load_column, menu_invite_create_entry,
+    ui_item_update_chat,
+    ui_remove_column,
+    ui_remove_item,
+    ui_rename_column,
+    ui_update_board_title,
+    ui_update_item_assignees, ui_update_item_color,
+    ui_update_item_description,
+    ui_update_item_move_to_column,
+    ui_update_item_name
+} from "./board_ui.js";
 
 var curr_board;
 var curr_context_menu;
@@ -769,7 +784,7 @@ function apply_operation(bid, operationID, apply_on_ui) {
     persist()
 }
 
-function clear_board() { // removes all active columns from the board
+export function clear_board() { // removes all active columns from the board
     var board = tremola.board[curr_board]
 
     for (var i in board.columns) {
@@ -782,14 +797,14 @@ function clear_board() { // removes all active columns from the board
     Debug menu
 */
 
-function ui_debug() {
+export function ui_debug() {
     closeOverlay()
     document.getElementById('div:debug').style.display = 'initial'
     document.getElementById('txt:debug').value = debug_toDot()//JSON.stringify(tremola.board[curr_board])
     document.getElementById("overlay-bg").style.display = 'initial';
 }
 
-function debug_toDot() {
+export function debug_toDot() {
     var board = tremola.board[curr_board]
     var exportStr = "digraph {\n"
     exportStr += "  rankdir=RL;\n"

@@ -109,7 +109,7 @@ function menu_sync() {
 }
 */
 
-function menu_new_conversation() {
+export function menu_new_conversation() {
     fill_members();
     setPrevScenario('chats');
     setScenario("members");
@@ -130,7 +130,7 @@ export function menu_new_contact() {
     setOverlayIsActive(true)
 }
 
-function menu_new_pub() {
+export function menu_new_pub() {
     menu_edit('new_pub_target', "Enter address of trustworthy pub<br><br>Format:<br><tt>net:IP_ADDR:PORT~shs:ID_OF_PUB</tt>", "");
 }
 
@@ -1191,7 +1191,7 @@ async function main () {
     /*if (process.platform !== 'ios') {
         setInterval(sendWantVector, 3000)
     }*/
-    setInterval(sendWantVector, 6000)
+    //setInterval(sendWantVector, 6000)
     //sendWantVector()
 }
 
@@ -2026,7 +2026,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
             load_chat_list();
         } else if (e.public[0] == "KAN") { // Kanban board event
             //TODO: b2f_new_in_order_event aufrufen... vom e...
-            //b2f_new_in_order_event(e)
+            b2f_new_in_order_event(e)
         } else if (e.public[0] == "IAM") {
             var contact = tremola.contacts[e.header.fid]
             var old_iam = contact.iam
