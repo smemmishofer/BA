@@ -1116,7 +1116,7 @@ async function main () {
             console.log('decoding message...')
             var string = new TextDecoder().decode(msg);
             var vector = JSON.parse(string)
-            console.log('Received new P2P message: ', vector)
+            //console.log('Received new P2P message: ', vector)
             receiveP2P(vector)
         })
         websocket.on('error', (err) => {
@@ -1191,7 +1191,7 @@ async function main () {
     /*if (process.platform !== 'ios') {
         setInterval(sendWantVector, 3000)
     }*/
-    //setInterval(sendWantVector, 6000)
+    setInterval(sendWantVector, 6000)
     //sendWantVector()
 }
 
@@ -1236,8 +1236,8 @@ function sendWantVector() {
             port = 50001
         } else if (process.env.USERNAME === 'Bob') {
             // for iOS: send to Charlie
-            //port = 50002
-            port = 50000
+            port = 50002
+            //port = 50000
         } else if (process.env.USERNAME === 'Charlie') {
             // for iOS: send to Bob
             port = 50001
@@ -1251,12 +1251,12 @@ function sendWantVector() {
             if (process.platform === 'ios') {
                 ipadr = '192.168.1.132'
             } else if (process.platform === 'darwin') {
-                //ipadr = '192.168.1.130'
+                ipadr = '192.168.1.130'
             }
 
             try {
                 websocket.send(msg, port, ipadr, (err) => {
-                    console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
+                    //console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                     if (err) {
                         console.error('Error sending message:', err);
                         websocket.close();
@@ -1392,7 +1392,7 @@ export function generateWantVector(replicas) {
 }
 
 async function receiveP2P(vector) {
-    console.log('vector: ', vector)
+    //console.log('vector: ', vector)
 
     if (vector.type == 'v') {
         console.log('vector is a want vector')
@@ -1420,8 +1420,8 @@ async function receiveP2P(vector) {
                         port = 50001
                     } else if (process.env.USERNAME === 'Bob') {
                         // for iOS: send to Charlie
-                        //port = 50002
-                        port = 50000
+                        port = 50002
+                        //port = 50000
                     } else if (process.env.USERNAME === 'Charlie') {
                         // for iOS: send to Bob
                         port = 50001
@@ -1432,14 +1432,14 @@ async function receiveP2P(vector) {
                     if (process.platform === 'ios') {
                         ipadr = '192.168.1.132'
                     } else if (process.platform === 'darwin') {
-                        //ipadr = '192.168.1.130'
+                        ipadr = '192.168.1.130'
                     }
 
                     var msg = Buffer.from(JSON.stringify(dataVec))
                     if (process.env.MODE === 'web') {
                         try {
                             websocket.send(msg, port, ipadr, (err) => {
-                                console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
+                                //console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                                 if (err) {
                                     console.error('Error sending message:', err);
                                     websocket.close();
@@ -1623,6 +1623,10 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         await restreamAllLogs()
     } else if (cmdStr[0] === 'add:contact') {
         console.log('adding contact: ...')
+        console.log('New Contact ID: ', cmdStr[1])
+        // Maybe make new empty file here for the contact?
+        await createReplica(cmdStr[1]);
+        await fid2replica(cmdStr[1]);
     }
 
     else {

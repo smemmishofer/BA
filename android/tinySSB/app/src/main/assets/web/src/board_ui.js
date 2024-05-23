@@ -2,9 +2,18 @@
 
 "use strict";
 
-import {escapeHTML, fill_members, menu_edit, persist, recps2display, tremola} from "./tremola.js"
+import {escapeHTML, fill_members, load_chat, menu_edit, persist, recps2display, tremola} from "./tremola.js"
 import {closeOverlay, setOverlayIsActive, setPrevScenario, setScenario} from "./tremola_ui.js";
-import {setCurrContextMenu, getCurrContextMenu, getCurrItem, createBoard, FLAG} from "./board.js";
+import {
+    setCurrContextMenu,
+    getCurrContextMenu,
+    getCurrItem,
+    createBoard,
+    FLAG,
+    curr_board,
+    setCurrBoard,
+    moveItem, leave
+} from "./board.js";
 
 const Color = { // all available colors for card title
     BLACK: 'black',
@@ -100,7 +109,7 @@ export function load_board_list() {
             item = document.createElement('div');
             item.setAttribute('style', "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;");
             if (board.forgotten) bg = ' gray'; else bg = ' light';
-            row = "<button class='board_item_button w100" + bg + "' onclick='load_board(\"" + bid + "\");' style='overflow: hidden; position: relative;'>";
+            row = "<button class='board_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
             row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + board.name + "</div>";
             row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + ", </font><font size=-3>last changed: " + date + "</font> </div></div>";
             badgeId = bid + "-badge_board"
@@ -110,6 +119,11 @@ export function load_board_list() {
             item.innerHTML = row;
             cl.appendChild(item);
             ui_set_board_list_badge(bid)
+
+            var button = item.querySelector('button.board_item_button');
+            button.onclick = function() {
+                load_board(bid);
+            };
         }
     }
 }
@@ -148,7 +162,7 @@ export function btn_create_personal_board_decline() {
 }
 
 export function load_board(bid) { //switches scene to board and changes title to board name
-    curr_board = bid
+    setCurrBoard(bid)
     var b = tremola.board[bid]
 
     b.unreadEvents = 0

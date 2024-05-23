@@ -8,7 +8,7 @@ import {Timeline} from "./scuttlesort.js";
 import {
     load_board,
     load_board_list,
-    load_column, menu_invite_create_entry,
+    load_column, menu_board_invitation_create_entry, menu_invite_create_entry,
     ui_item_update_chat,
     ui_remove_column,
     ui_remove_item,
@@ -20,10 +20,22 @@ import {
     ui_update_item_name
 } from "./board_ui.js";
 
-var curr_board;
-var curr_context_menu;
-var curr_column;
-var curr_item;
+export var curr_board;
+export function setCurrBoard(value) {
+    curr_board = value
+}
+export var curr_context_menu;
+export function setCurrContextMenuBoard(value) {
+    curr_context_menu = value
+}
+export var curr_column;
+export function setCurrColumn(value) {
+    curr_column = value
+}
+export var curr_item;
+/*export function setCurrItemBoard(value) {
+    curr_item = value
+}*/
 
 var curr_rename_item;
 
@@ -82,7 +94,7 @@ export function createBoard(name, flags) {
     board_send_to_backend(data)
 }
 
-function renameBoard(bid, name) {
+export function renameBoard(bid, name) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -92,7 +104,7 @@ function renameBoard(bid, name) {
     board_send_to_backend(data)
 }
 
-function createColumn(bid, name) {
+export function createColumn(bid, name) {
     console.log("create column")
     var board = tremola.board[bid]
     var data = {
@@ -103,7 +115,7 @@ function createColumn(bid, name) {
     board_send_to_backend(data)
 }
 
-function createColumnItem(bid, cid, name) {
+export function createColumnItem(bid, cid, name) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -113,7 +125,7 @@ function createColumnItem(bid, cid, name) {
     board_send_to_backend(data)
 }
 
-function removeColumn(bid, cid) {
+export function removeColumn(bid, cid) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -123,7 +135,7 @@ function removeColumn(bid, cid) {
     board_send_to_backend(data)
 }
 
-function renameColumn(bid, cid, newName) {
+export function renameColumn(bid, cid, newName) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -133,7 +145,7 @@ function renameColumn(bid, cid, newName) {
     board_send_to_backend(data)
 }
 
-function removeItem(bid, iid) {
+export function removeItem(bid, iid) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -143,7 +155,7 @@ function removeItem(bid, iid) {
     board_send_to_backend(data)
 }
 
-function renameItem(bid, iid, new_name) {
+export function renameItem(bid, iid, new_name) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -153,7 +165,7 @@ function renameItem(bid, iid, new_name) {
     board_send_to_backend(data)
 }
 
-function moveItem(bid, iid, new_cid) {
+export function moveItem(bid, iid, new_cid) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -163,7 +175,7 @@ function moveItem(bid, iid, new_cid) {
     board_send_to_backend(data)
 }
 
-function setItemDescription(bid, iid, description) {
+export function setItemDescription(bid, iid, description) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -173,7 +185,7 @@ function setItemDescription(bid, iid, description) {
     board_send_to_backend(data)
 }
 
-function postItemComment(bid, iid, comment) {
+export function postItemComment(bid, iid, comment) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -183,7 +195,7 @@ function postItemComment(bid, iid, comment) {
     board_send_to_backend(data)
 }
 
-function assignToItem(bid, iid, assigned) {
+export function assignToItem(bid, iid, assigned) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -193,7 +205,7 @@ function assignToItem(bid, iid, assigned) {
     board_send_to_backend(data)
 }
 
-function unassignFromItem(bid, iid, unassign) {
+export function unassignFromItem(bid, iid, unassign) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -203,7 +215,7 @@ function unassignFromItem(bid, iid, unassign) {
     board_send_to_backend(data)
 }
 
-function setItemColor(bid, iid, color) {
+export function setItemColor(bid, iid, color) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -213,7 +225,7 @@ function setItemColor(bid, iid, color) {
     board_send_to_backend(data)
 }
 
-function inviteUser(bid, userID) {
+export function inviteUser(bid, userID) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -223,7 +235,7 @@ function inviteUser(bid, userID) {
     board_send_to_backend(data)
 }
 
-function inviteAccept(bid, prev) {
+export function inviteAccept(bid, prev) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -233,7 +245,7 @@ function inviteAccept(bid, prev) {
     board_send_to_backend(data)
 }
 
-function inviteDecline(bid, prev) {
+export function inviteDecline(bid, prev) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -243,7 +255,7 @@ function inviteDecline(bid, prev) {
     board_send_to_backend(data)
 }
 
-function leave(bid) {
+export function leave(bid) {
     var board = tremola.board[bid]
     var data = {
         'bid': bid,
@@ -254,7 +266,7 @@ function leave(bid) {
 }
 
 
-function board_send_to_backend(data) {
+export function board_send_to_backend(data) {
     var bid = data['bid'] != null ? data['bid'] : "null"
     var prevs = data['prev'] != null ? btoa(data['prev'].map(btoa)) : "null"
     var op = data['cmd'][0] //btoa(data['cmd'][0])

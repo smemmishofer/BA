@@ -28,7 +28,7 @@ import {
     menu_new_board
 } from "./board_ui.js";
 import {getSetting} from "./tremola_settings.js";
-import {setCurrItem} from "./board.js";
+import {FLAG, setCurrItem} from "./board.js";
 import {QRCode} from "./qrcode.js";
 import process from "socket:process";
 
