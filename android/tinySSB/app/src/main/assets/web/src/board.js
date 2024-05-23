@@ -248,7 +248,7 @@ function board_send_to_backend(data) {
     backend(to_backend.join(" "))
 }
 
-function kanban_new_event(e) {
+export function kanban_new_event(e) {
     // parse data
     var op = e.public[3]
     var bid = op == Operation.BOARD_CREATE ? e.header.ref : e.public[1]

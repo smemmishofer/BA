@@ -51,7 +51,7 @@ import { decode } from './bipf/decode.js'
 import { allocAndEncode, encode } from "./bipf/encode.js";
 import { seekKey } from "./bipf/seekers.js";
 
-import {createBoard} from "./board.js";
+import {createBoard, kanban_new_event} from "./board.js";
 import {Timeline} from "./scuttlesort.js";
 
 // Changes for socket library
@@ -1090,10 +1090,6 @@ export function assignMenuOnClick() {
 
 document.body.setAttribute('platform', process.platform)
 
-if (process.platform === 'mac') {
-    // run some very specific code for mac
-}
-
 let websocket;
 async function main () {
     //findAndRemoveTremolaItems();
@@ -1240,7 +1236,8 @@ function sendWantVector() {
             port = 50001
         } else if (process.env.USERNAME === 'Bob') {
             // for iOS: send to Charlie
-            port = 50002
+            //port = 50002
+            port = 50000
         } else if (process.env.USERNAME === 'Charlie') {
             // for iOS: send to Bob
             port = 50001
@@ -1253,12 +1250,13 @@ function sendWantVector() {
 
             if (process.platform === 'ios') {
                 ipadr = '192.168.1.132'
-            } else if (process.platform === 'mac') {
-                ipadr = '192.168.1.130'
+            } else if (process.platform === 'darwin') {
+                //ipadr = '192.168.1.130'
             }
 
             try {
                 websocket.send(msg, port, ipadr, (err) => {
+                    console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                     if (err) {
                         console.error('Error sending message:', err);
                         websocket.close();
@@ -1422,7 +1420,8 @@ async function receiveP2P(vector) {
                         port = 50001
                     } else if (process.env.USERNAME === 'Bob') {
                         // for iOS: send to Charlie
-                        port = 50002
+                        //port = 50002
+                        port = 50000
                     } else if (process.env.USERNAME === 'Charlie') {
                         // for iOS: send to Bob
                         port = 50001
@@ -1432,14 +1431,15 @@ async function receiveP2P(vector) {
 
                     if (process.platform === 'ios') {
                         ipadr = '192.168.1.132'
-                    } else if (process.platform === 'mac') {
-                        ipadr = '192.168.1.130'
+                    } else if (process.platform === 'darwin') {
+                        //ipadr = '192.168.1.130'
                     }
 
                     var msg = Buffer.from(JSON.stringify(dataVec))
                     if (process.env.MODE === 'web') {
                         try {
                             websocket.send(msg, port, ipadr, (err) => {
+                                console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                                 if (err) {
                                     console.error('Error sending message:', err);
                                     websocket.close();
@@ -2026,6 +2026,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
             load_chat_list();
         } else if (e.public[0] == "KAN") { // Kanban board event
             //TODO: b2f_new_in_order_event aufrufen... vom e...
+            //b2f_new_in_order_event(e)
         } else if (e.public[0] == "IAM") {
             var contact = tremola.contacts[e.header.fid]
             var old_iam = contact.iam
