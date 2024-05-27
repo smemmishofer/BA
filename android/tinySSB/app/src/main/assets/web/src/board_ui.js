@@ -13,10 +13,19 @@ import {
     curr_board,
     curr_column,
     setCurrBoard,
-    moveItem, leave, removeColumn, inviteUser, inviteDecline, inviteAccept, setCurrColumn
+    moveItem,
+    leave,
+    removeColumn,
+    inviteUser,
+    inviteDecline,
+    inviteAccept,
+    setCurrColumn,
+    curr_item,
+    setCurrRenameItem,
+    setCurrItem
 } from "./board.js";
 
-const Color = { // all available colors for card title
+export const Color = { // all available colors for card title
     BLACK: 'black',
     RED: 'red',
     GREEN: 'green',
@@ -29,7 +38,8 @@ const Color = { // all available colors for card title
 
 export var display_create_personal_board = true // Whether to prompt the user to create a personal board when they open the Kanban application
 
-function allowDrop(ev) {
+window.allowDrop = allowDrop;
+export function allowDrop(ev) {
     ev.preventDefault();
 }
 
@@ -38,12 +48,14 @@ function myTouchFct(ev) {
     console.log(ev);
 }
 
-function dragStart(ev) {
+window.dragStart = dragStart;
+export function dragStart(ev) {
     console.log('drag started ' + ev.target.id);
     ev.dataTransfer.setData("text", ev.target.id);
 }
 
-function dragDrop(ev) {
+window.dragDrop = dragDrop;
+export function dragDrop(ev) {
     ev.preventDefault();
     console.log("event", ev)
     console.log('dragDrop', ev.target);
@@ -705,6 +717,7 @@ export function ui_move_column(columnID, insertPos) {
   Items
 */
 
+window.menu_create_item = menu_create_item;
 export function menu_create_item(columnID) {
     setCurrColumn(columnID)
     menu_edit('board_new_item', 'Enter name of new Card', '')
@@ -753,10 +766,11 @@ export function load_all_items() {
     }
 }
 
+window.item_menu = item_menu;
 export function item_menu(itemID) {
     closeOverlay()
-    curr_rename_item = itemID
-    curr_item = itemID
+    setCurrRenameItem(itemID)
+    setCurrItem(itemID)
     document.getElementById('overlay-bg').style.display = 'initial';
     setOverlayIsActive(true)
 

@@ -20,7 +20,7 @@ import {
     qr_scan_success,
     menu_connection,
     menu_settings,
-    menu_about,
+    menu_about, launch_snackbar,
 } from "./tremola_ui.js";
 import {
     get_default_settings,
@@ -36,7 +36,7 @@ import {
     menu_new_board,
     menu_board_invitations,
     menu_new_board_name,
-    menu_new_column
+    menu_new_column, menu_rename_column, item_menu
 } from "./board_ui.js";
 import {
     appendContent,
@@ -56,7 +56,7 @@ import {
     createBoard,
     kanban_new_event,
     createColumn,
-    curr_board
+    curr_board, createColumnItem, renameBoard, renameColumn, renameItem, curr_column, curr_rename_item
 } from "./board.js";
 import {Timeline} from "./scuttlesort.js";
 
@@ -1204,8 +1204,7 @@ async function main () {
     /*if (process.platform !== 'ios') {
         setInterval(sendWantVector, 3000)
     }*/
-    setInterval(sendWantVector, 6000)
-    //sendWantVector()
+    //setInterval(sendWantVector, 6000)
 }
 
 window.addEventListener('DOMContentLoaded', main)

@@ -18,7 +18,7 @@ import {
     ui_update_item_description,
     ui_update_item_move_to_column,
     ui_update_item_name,
-    context_menu_column_options
+    context_menu_column_options, Color, load_item
 } from "./board_ui.js";
 
 export var curr_board;
@@ -38,7 +38,10 @@ export var curr_item;
     curr_item = value
 }*/
 
-var curr_rename_item;
+export var curr_rename_item;
+export function setCurrRenameItem(value) {
+    curr_rename_item = value
+}
 
 // all available operations
 const Operation = {
