@@ -2,7 +2,7 @@
 
 "use strict";
 
-import {backend, tremola, myId, unicodeStringToTypedArray, persist} from "./tremola.js";
+import {backend, tremola, myId, unicodeStringToTypedArray, persist, restream} from "./tremola.js";
 import {closeOverlay, getCurrScenario, launch_snackbar} from "./tremola_ui.js";
 import {Timeline} from "./scuttlesort.js";
 import {
@@ -17,7 +17,8 @@ import {
     ui_update_item_assignees, ui_update_item_color,
     ui_update_item_description,
     ui_update_item_move_to_column,
-    ui_update_item_name
+    ui_update_item_name,
+    context_menu_column_options
 } from "./board_ui.js";
 
 export var curr_board;
@@ -369,7 +370,8 @@ export function kanban_new_event(e) {
         if (op == Operation.BOARD_CREATE && e.header.fid == myId) {
             var pendingInvites = []
             for (var m in tremola.contacts) {
-                if (m != myId && document.getElementById(m).checked) {
+                var d = document.getElementById(m);
+                if (m != myId && d && d.checked) {
                     inviteUser(bid, m)
                     console.log("Invited: " + m)
                 }

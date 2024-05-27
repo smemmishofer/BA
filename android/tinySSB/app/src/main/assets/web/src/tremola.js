@@ -35,7 +35,8 @@ import {
     load_board_list,
     menu_new_board,
     menu_board_invitations,
-    menu_new_board_name
+    menu_new_board_name,
+    menu_new_column
 } from "./board_ui.js";
 import {
     appendContent,
@@ -51,7 +52,12 @@ import { decode } from './bipf/decode.js'
 import { allocAndEncode, encode } from "./bipf/encode.js";
 import { seekKey } from "./bipf/seekers.js";
 
-import {createBoard, kanban_new_event} from "./board.js";
+import {
+    createBoard,
+    kanban_new_event,
+    createColumn,
+    curr_board
+} from "./board.js";
 import {Timeline} from "./scuttlesort.js";
 
 // Changes for socket library
@@ -83,7 +89,7 @@ export var curr_img_candidate = null;
 var pubs = []
 var wants = {}
 
-var restream = false // whether the backend is currently restreaming all posts
+export var restream = false // whether the backend is currently restreaming all posts
 
 export function getNewContactID() {
     return new_contact_id
@@ -1103,18 +1109,17 @@ async function main () {
     // try communication over websocket
     const mode = process.env.MODE
     if (mode === 'web') {
+        console.log('initializing UDP in WEB mode...')
         websocket = createSocket('udp4')
 
-        if(username === 'Alice') {
-            websocket.bind(50000, '0.0.0.0', () => console.log('Binding complete'))
-        } else if (username === 'Bob') {
-            websocket.bind(50001, '0.0.0.0', () => console.log('Binding complete'))
-        } else if (username === 'Charlie') {
-            websocket.bind(50002, '0.0.0.0', () => console.log('Binding complete'))
-        }
+        websocket.on('listening', () => {
+            const address = websocket.address();
+            console.log(`server listening ${address.address}:${address.port}`);
+        });
         websocket.on('message', (msg, rinfo) => {
             console.log('decoding message...')
             var string = new TextDecoder().decode(msg);
+            console.log('string before parsing: ', string)
             var vector = JSON.parse(string)
             //console.log('Received new P2P message: ', vector)
             receiveP2P(vector)
@@ -1123,6 +1128,14 @@ async function main () {
             console.error('UDP socket error:', err);
             websocket.close();
         });
+
+        if(username === 'Alice') {
+            websocket.bind(50000, '0.0.0.0', () => console.log('Binding complete, port: ', 50000))
+        } else if (username === 'Bob') {
+            websocket.bind(50003, '0.0.0.0', () => console.log('Binding complete, port: ', 50003))
+        } else if (username === 'Charlie') {
+            websocket.bind(50002, '0.0.0.0', () => console.log('Binding complete, port: ', 50002))
+        }
     }
 
     //console.log('Tremola local var: ', tremola)
@@ -1240,7 +1253,7 @@ function sendWantVector() {
             //port = 50000
         } else if (process.env.USERNAME === 'Charlie') {
             // for iOS: send to Bob
-            port = 50001
+            port = 50003
         }
         var msg = Buffer.from(JSON.stringify(wantVec))
         if (process.env.MODE === 'web') {
@@ -1256,7 +1269,7 @@ function sendWantVector() {
 
             try {
                 websocket.send(msg, port, ipadr, (err) => {
-                    //console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
+                    console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                     if (err) {
                         console.error('Error sending message:', err);
                         websocket.close();
@@ -1347,7 +1360,9 @@ async function initP2P() {
 // Create (or read from storage) a peer ID and a key-pair for signing.
         const uuid = '6e400001-7646-4b5b-9a50-71becce51558'
 //
-        const peerId = await Encryption.createId(uuid)
+        //TODO: Add username to the peerID; such that each participant has a unique peerID
+        // because else, messages might get ignored if they come from the same peerID!!
+        const peerId = await Encryption.createId(uuid + username)
         const signingKeys = await Encryption.createKeyPair(uuid)
 
 //
@@ -1424,7 +1439,7 @@ async function receiveP2P(vector) {
                         //port = 50000
                     } else if (process.env.USERNAME === 'Charlie') {
                         // for iOS: send to Bob
-                        port = 50001
+                        port = 50003
                     }
 
                     let ipadr = '127.0.0.1'
@@ -1439,7 +1454,7 @@ async function receiveP2P(vector) {
                     if (process.env.MODE === 'web') {
                         try {
                             websocket.send(msg, port, ipadr, (err) => {
-                                //console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
+                                console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                                 if (err) {
                                     console.error('Error sending message:', err);
                                     websocket.close();

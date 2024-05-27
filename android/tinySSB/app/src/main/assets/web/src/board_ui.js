@@ -2,8 +2,8 @@
 
 "use strict";
 
-import {escapeHTML, fill_members, load_chat, menu_edit, persist, recps2display, tremola} from "./tremola.js"
-import {closeOverlay, setOverlayIsActive, setPrevScenario, setScenario} from "./tremola_ui.js";
+import {escapeHTML, fill_members, load_chat, menu_edit, myId, persist, recps2display, tremola} from "./tremola.js"
+import {closeOverlay, launch_snackbar, setOverlayIsActive, setPrevScenario, setScenario} from "./tremola_ui.js";
 import {
     setCurrContextMenu,
     getCurrContextMenu,
@@ -11,8 +11,9 @@ import {
     createBoard,
     FLAG,
     curr_board,
+    curr_column,
     setCurrBoard,
-    moveItem, leave
+    moveItem, leave, removeColumn, inviteUser, inviteDecline, inviteAccept, setCurrColumn
 } from "./board.js";
 
 const Color = { // all available colors for card title
@@ -162,6 +163,7 @@ export function btn_create_personal_board_decline() {
 }
 
 export function load_board(bid) { //switches scene to board and changes title to board name
+    console.log('loading board: ', bid)
     setCurrBoard(bid)
     var b = tremola.board[bid]
 
@@ -588,7 +590,6 @@ export function load_column(columnID) {
     columnsHTML += "</div></div>"
 
     document.getElementById("div:columns_container").innerHTML += columnsHTML
-
 }
 
 export function load_all_columns() {
@@ -598,6 +599,7 @@ export function load_all_columns() {
     }
 }
 
+window.context_menu_column_options = context_menu_column_options;
 export function context_menu_column_options(columnID) {
     close_board_context_menu()
     document.getElementById("overlay-trans").style.display = 'initial';
@@ -704,7 +706,7 @@ export function ui_move_column(columnID, insertPos) {
 */
 
 export function menu_create_item(columnID) {
-    curr_column = columnID
+    setCurrColumn(columnID)
     menu_edit('board_new_item', 'Enter name of new Card', '')
 }
 
