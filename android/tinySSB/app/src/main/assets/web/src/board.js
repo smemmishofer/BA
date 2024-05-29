@@ -18,7 +18,7 @@ import {
     ui_update_item_description,
     ui_update_item_move_to_column,
     ui_update_item_name,
-    context_menu_column_options, Color, load_item
+    context_menu_column_options, Color, load_item, ui_update_board
 } from "./board_ui.js";
 
 export var curr_board;
@@ -427,7 +427,8 @@ export function kanban_new_event(e) {
 
 }
 
-function reload_curr_board() {
+window.reload_curr_board = reload_curr_board;
+export function reload_curr_board() {
     if (curr_board)
         board_reload(curr_board)
 }
@@ -814,6 +815,7 @@ export function clear_board() { // removes all active columns from the board
     Debug menu
 */
 
+window.ui_debug = ui_debug;
 export function ui_debug() {
     closeOverlay()
     document.getElementById('div:debug').style.display = 'initial'

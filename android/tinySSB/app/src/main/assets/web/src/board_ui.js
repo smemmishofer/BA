@@ -22,7 +22,7 @@ import {
     setCurrColumn,
     curr_item,
     setCurrRenameItem,
-    setCurrItem
+    setCurrItem, setItemDescription, setItemColor, removeItem, postItemComment
 } from "./board.js";
 
 export const Color = { // all available colors for card title
@@ -306,6 +306,7 @@ export function equalArrays(array1, array2) {
     return true
 }
 
+window.close_board_context_menu = close_board_context_menu;
 export function close_board_context_menu() {
     if (getCurrContextMenu()) {
         var context_menu = document.getElementById(getCurrContextMenu())
@@ -315,6 +316,7 @@ export function close_board_context_menu() {
     setCurrContextMenu(null)
 }
 
+window.menu_history = menu_history;
 export function menu_history() {
     closeOverlay()
     document.getElementById('overlay-bg').style.display = 'initial';
@@ -414,6 +416,7 @@ export function menu_board_invitation_create_entry(bid) {
     document.getElementById("kanban_invitations_list").innerHTML += invHTML
 }
 
+window.btn_invite_accept = btn_invite_accept;
 export function btn_invite_accept(bid) {
     inviteAccept(bid, tremola.board[bid].pendingInvitations[myId])
     delete tremola.board[bid].pendingInvitations[myId]
@@ -423,6 +426,7 @@ export function btn_invite_accept(bid) {
         inv.outerHTML = ""
 }
 
+window.btn_invite_decline = btn_invite_decline;
 export function btn_invite_decline(bid) {
     inviteDecline(bid, tremola.board[bid].pendingInvitations[myId])
     delete tremola.board[bid].pendingInvitations[myId]
@@ -452,6 +456,7 @@ export function menu_new_board_name() {
     menu_edit('new_board', 'Enter the name of the new board', '')
 }
 
+window.menu_rename_board = menu_rename_board;
 export function menu_rename_board() {
     var board = tremola.board[curr_board]
     menu_edit('board_rename', 'Enter a new name for this board', board.name)
@@ -549,12 +554,14 @@ export function menu_invite_create_entry(id) {
     document.getElementById("menu_invite_content").innerHTML += invHTML
 }
 
+window.btn_invite = btn_invite;
 export function btn_invite(userId, bid) {
     console.log("INVITE: " + userId + ", bid: " + bid)
     inviteUser(bid, userId)
     launch_snackbar("User invited")
 }
 
+window.leave_curr_board = leave_curr_board;
 export function leave_curr_board() {
     closeOverlay()
 
@@ -642,11 +649,13 @@ export function contextmenu_move_column(columnID) {
     document.getElementById('context_options-' + columnID).innerHTML = menuHTML
 }
 
+window.menu_rename_column = menu_rename_column;
 export function menu_rename_column(columnID) {
-    curr_column = columnID
+    setCurrColumn(columnID)
     menu_edit('board_rename_column', 'Enter new name: ', tremola.board[curr_board].columns[columnID].name)
 }
 
+window.btn_remove_column = btn_remove_column;
 export function btn_remove_column(columnID) {
     removeColumn(curr_board, columnID)
     closeOverlay()
@@ -671,6 +680,7 @@ export function ui_remove_column(columnID) {
     document.getElementById(columnID + "-columnWrapper").outerHTML = "" //remove column from ui
 }
 
+window.ui_move_column = ui_move_column;
 export function ui_move_column(columnID, insertPos) {
     console.log('move', columnID, insertPos);
     closeOverlay()
@@ -824,6 +834,7 @@ export function item_menu(itemID) {
     document.getElementById("div:item_menu_assignees").innerHTML = assigneesHTML
 }
 
+window.item_menu_save_description = item_menu_save_description;
 export function item_menu_save_description() {
     var new_description = document.getElementById('div:item_menu_description_text').value
     var item = tremola.board[curr_board].items[curr_item]
@@ -836,6 +847,7 @@ export function item_menu_save_description() {
     document.getElementById('btn:item_menu_description_cancel').style.display = 'none'
 }
 
+window.item_menu_cancel_description = item_menu_cancel_description;
 export function item_menu_cancel_description() {
     document.getElementById('div:item_menu_description_text').style.border = 'none'
     document.getElementById('div:item_menu_description_text').value = tremola.board[curr_board].items[curr_item].description
@@ -877,11 +889,13 @@ export function contextmenu_change_column() {
     setOverlayIsActive(true)
 }
 
+window.btn_move_item = btn_move_item;
 export function btn_move_item(item, new_column) {
     moveItem(curr_board, item, new_column)
     close_board_context_menu()
 }
 
+window.btn_remove_item = btn_remove_item;
 export function btn_remove_item() {
     removeItem(curr_board, curr_item)
     closeOverlay()
@@ -918,6 +932,7 @@ export function contextmenu_item_change_position() {
     setOverlayIsActive(true)
 }
 
+window.contextmenu_item_assign = contextmenu_item_assign;
 export function contextmenu_item_assign() {
     close_board_context_menu()
     var board = tremola.board[curr_board]
@@ -944,6 +959,7 @@ export function contextmenu_item_assign() {
     setOverlayIsActive(true)
 }
 
+window.btn_post_comment = btn_post_comment;
 export function btn_post_comment() {
     var comment = document.getElementById('item_menu_comment_text').value
     if (comment == '')
@@ -957,6 +973,7 @@ function btn_rename_item() {
 
 }
 
+window.ui_change_item_order = ui_change_item_order;
 export function ui_change_item_order(itemID, newPos) {
     close_board_context_menu()
     newPos = parseInt(newPos)
@@ -1018,6 +1035,7 @@ export function ui_remove_item(itemID) {
     document.getElementById(itemID + '-item').outerHTML = ""
 }
 
+window.ui_item_assign = ui_item_assign;
 export function ui_item_assign(fid) {
     //close_board_context_menu()
     var board = tremola.board[curr_board]
@@ -1042,6 +1060,7 @@ export function ui_move_item(itemID, old_pos) {
     load_item(curr_op.body.cmd[1])
 }
 
+window.contextmenu_change_color =  contextmenu_change_color;
 export function contextmenu_change_color() {
     close_board_context_menu()
     var board = tremola.board[curr_board]
@@ -1062,6 +1081,7 @@ export function contextmenu_change_color() {
     setOverlayIsActive(true)
 }
 
+window.btn_change_item_color = btn_change_item_color;
 export function btn_change_item_color(iid, color) {
     close_board_context_menu()
     setItemColor(curr_board, iid, color)

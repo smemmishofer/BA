@@ -156,6 +156,7 @@ export function menu_redraw() {
         load_chat(curr_chat);
 }
 
+window.menu_edit = menu_edit;
 export function menu_edit(target, title, text) {
     closeOverlay()
     document.getElementById('edit-overlay').style.display = 'initial';
