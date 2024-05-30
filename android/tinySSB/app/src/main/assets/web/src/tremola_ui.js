@@ -128,6 +128,7 @@ export const QR_SCAN_TARGET = {
 
 var curr_qr_scan_target = QR_SCAN_TARGET.ADD_CONTACT
 
+window.onBackPressed = onBackPressed;
 export function onBackPressed() {
     //console.log('onBackPressed...')
     if (overlayIsActive) {

@@ -26,12 +26,17 @@ export async function loadRepo() {
   // Falls nein, dieses erstellen
 
   try {
+    console.log(repoPath)
     await fs.access(repoPath);
     console.log('can access');
   } catch {
     console.error('cannot access repo path');
     console.log('making new directory...')
-    await fs.mkdir(repoPath)
+    try {
+      await fs.mkdir(repoPath)
+    } catch (err) {
+      console.log('error making directory: ', err, 'directory-path: ', repoPath)
+    }
   }
 
   // Alle Dateinamen holen (Dateiname = FeedID des entsprechenden Logs)
@@ -76,15 +81,21 @@ export async function createReplica(fid) {
       console.log('File already exists:', path.join(repoPath, `/${fid}.log`));
       return; // File already exists
     } catch (err) {
-      console.error('error while accessing file in createReplica')
+      console.error('error while accessing file in createReplica: ', err)
+      console.log('error while accessing file in createReplica: filepath: ', path.join(repoPath, `/${fid}.log`))
       // continue
+
+      // Write an empty file (you can later write binary data to it)
+      console.log('creating new file: repopath: ', repoPath)
+      var filePath = path.join(repoPath, `/${fid}.log`)
+      console.log('creating new file: filePath: ', filePath)
+      await fs.writeFile(filePath, '')
+      // var fhandle = await fs.open(filePath, 'a');
+      console.log('after writing file...')
+      // fidlist.push(fid)
+      // await fhandle.close()
+      console.log('File created successfully:', path.join(repoPath, `/${fid}.log`));
     }
-    // Write an empty file (you can later write binary data to it)
-    var filePath = path.join(repoPath, `/${fid}.log`)
-    var fhandle = await fs.open(filePath, 'a');
-    fidlist.push(fid)
-    await fhandle.close()
-    console.log('File created successfully:', path.join(repoPath, `/${fid}.log`));
   } catch (err) {
     console.error('Error creating file: ', err)
   }

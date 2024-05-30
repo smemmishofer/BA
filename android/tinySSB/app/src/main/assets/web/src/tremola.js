@@ -942,10 +942,10 @@ function initializeAllButtons() {
     prevbutton.onclick = function() {
         showPreview2();
     };
-    var backbutton = document.getElementById('back');
-    backbutton.onclick = function() {
-        onBackPressed();
-    };
+    // var backbutton = document.getElementById('back');
+    // backbutton.onclick = function() {
+    //     onBackPressed();
+    // };
     var btnchats = document.getElementById('btn:chats');
     btnchats.onclick = function() {
         btnBridge(this);
@@ -1097,7 +1097,8 @@ export function assignMenuOnClick() {
 
 document.body.setAttribute('platform', process.platform)
 
-let websocket;
+let incomingsocket;
+let outgoingsocket;
 async function main () {
     //findAndRemoveTremolaItems();
     if(username) {
@@ -1111,13 +1112,17 @@ async function main () {
     const mode = process.env.MODE
     if (mode === 'web') {
         console.log('initializing UDP in WEB mode...')
-        websocket = createSocket('udp4')
+        incomingsocket = createSocket('udp4')
+        outgoingsocket = createSocket('udp4')
 
-        websocket.on('listening', () => {
-            const address = websocket.address();
+        incomingsocket.on('listening', () => {
+            const address = incomingsocket.address();
             console.log(`server listening ${address.address}:${address.port}`);
         });
-        websocket.on('message', (msg, rinfo) => {
+        // incomingsocket.on('#ready', info => {
+        //     console.log(info)
+        // })
+        incomingsocket.on('message', (msg, rinfo) => {
             console.log('decoding message...')
             var string = new TextDecoder().decode(msg);
             console.log('string before parsing: ', string)
@@ -1125,17 +1130,19 @@ async function main () {
             //console.log('Received new P2P message: ', vector)
             receiveP2P(vector)
         })
-        websocket.on('error', (err) => {
+        incomingsocket.on('error', (err) => {
             console.error('UDP socket error:', err);
-            websocket.close();
+            incomingsocket.close();
         });
 
         if(username === 'Alice') {
-            websocket.bind(50000, '0.0.0.0', () => console.log('Binding complete, port: ', 50000))
+            incomingsocket.bind(50000, '0.0.0.0', () => console.log('Binding complete, port: ', 50000))
         } else if (username === 'Bob') {
-            websocket.bind(50003, '0.0.0.0', () => console.log('Binding complete, port: ', 50003))
+            incomingsocket.bind(50003, '0.0.0.0', () => console.log('Binding complete, port: ', 50003))
         } else if (username === 'Charlie') {
-            websocket.bind(50002, '0.0.0.0', () => console.log('Binding complete, port: ', 50002))
+            incomingsocket.bind(50002, '0.0.0.0', () => console.log('Binding complete, port: ', 50002))
+        } else {
+            incomingsocket.bind(50002, '0.0.0.0', () => console.log('Binding complete, port: ', 50002))
         }
     }
 
@@ -1205,7 +1212,7 @@ async function main () {
     /*if (process.platform !== 'ios') {
         setInterval(sendWantVector, 3000)
     }*/
-    //setInterval(sendWantVector, 6000)
+    setInterval(sendWantVector, 6000)
 }
 
 window.addEventListener('DOMContentLoaded', main)
@@ -1244,7 +1251,7 @@ function sendWantVector() {
         console.log('\n')
         console.log(JSON.parse(Buffer.from(JSON.stringify(wantVec)).toString()))*/
 
-        let port;
+        let port = 50003;
         if (process.env.USERNAME === 'Alice') {
             port = 50001
         } else if (process.env.USERNAME === 'Bob') {
@@ -1268,11 +1275,11 @@ function sendWantVector() {
             }
 
             try {
-                websocket.send(msg, port, ipadr, (err) => {
+                outgoingsocket.send(msg, port, ipadr, (err) => {
                     console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                     if (err) {
                         console.error('Error sending message:', err);
-                        websocket.close();
+                        outgoingsocket.close();
                         console.log('Socket got closed...');
                     } else {
                         console.log('Message sent:', wantVec);
@@ -1430,7 +1437,7 @@ async function receiveP2P(vector) {
                     const entryToSend = replicas[fid].logEntries[desiredEntry -1]
                     const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:decode(entryToSend, 0) } };
                     //TODO: send dataVec over P2P!!
-                    let port;
+                    let port = 50003;
                     if (process.env.USERNAME === 'Alice') {
                         port = 50001
                     } else if (process.env.USERNAME === 'Bob') {
@@ -1453,11 +1460,11 @@ async function receiveP2P(vector) {
                     var msg = Buffer.from(JSON.stringify(dataVec))
                     if (process.env.MODE === 'web') {
                         try {
-                            websocket.send(msg, port, ipadr, (err) => {
+                            outgoingsocket.send(msg, port, ipadr, (err) => {
                                 console.log(`Sending msg: ${msg} to ip: ${ipadr} and port: ${port}`)
                                 if (err) {
                                     console.error('Error sending message:', err);
-                                    websocket.close();
+                                    outgoingsocket.close();
                                     console.log('Socket got closed...');
                                 } else {
                                     //console.log('Message sent:', msg);
@@ -1472,7 +1479,7 @@ async function receiveP2P(vector) {
 
                     console.log('send data packet with number: ', desiredEntry)
                     console.log('data vector to send: ', dataVec)
-                    console.log('corresponding log entry: ', decode(dataVec.content.entry, 0))
+                    console.log('corresponding log entry: ', dataVec.content.entry)
                     // then return because we only send 1 packet
                     return;
                 }
@@ -1573,11 +1580,11 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         await appendContent(r, ebipf)
 
         //TODO: Continue here/ Fix this
-        const read_e = await readContent(r, r.logEntries.length -1);
+        //const read_e = await readContent(r, r.logEntries.length -1);
         //const read_e = await readContent(r, 0);
 
         //console.log('Whole array of log entries: ', decode(readAllContent(r)))
-        for (const [key, value] of Object.entries(getReplicas())) {
+        /*for (const [key, value] of Object.entries(getReplicas())) {
             const r = value;
             console.log('replica key: ', key);
             console.log('replica value: ', r);
@@ -1587,7 +1594,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
                 }
             }
         }
-
+*/
         // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
         //TODO: Implement "restream" --> See backend("restream"); in settings_restream_posts() method!
 
@@ -1595,6 +1602,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         b2f_new_event(e)
         //sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
+        console.log('backend, kanban: ', cmdStr)
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
         if (prev != "null") {
             prev = atob(cmdStr[2])
@@ -1605,12 +1613,12 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
             args = atob(cmdStr[4])
             args = args.split(",").map(atob)
         }
-        var data = {
+/*        var data = {
             'bid': cmdStr[1],
             'prev': prev,
             'op': cmdStr[3],
             'args': args
-        }
+        }*/
         var e = {
             'header': {
                 'tst': Date.now(),
@@ -1620,6 +1628,13 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
             'confid': {},
             'public': ["KAN", cmdStr[1], prev, cmdStr[3]].concat(args)
         }
+
+        var ebipf = allocAndEncode(e)
+        await createReplica(tremola.id)
+        var r = await fid2replica(tremola.id)
+
+        await appendContent(r, ebipf)
+
         //console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
         //console.log(e)

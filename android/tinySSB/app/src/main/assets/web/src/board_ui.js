@@ -604,7 +604,7 @@ export function load_column(columnID) {
     columnsHTML += "<div class='context_menu' id='context_options-" + columnID + "'> "
     columnsHTML += "</div></div></div>"
     columnsHTML += "<div style='overflow:auto;max-height: calc(100vh - 140px);'><div class='column_content' id='" + columnID + "-columnContent'></div></div>"
-    //columnsHTML += "<div style='order: 100000;width: 95%; margin: auto;'><button class='board_item_button w100' onclick='menu_create_column_item(\"" + columnID +"\")' style='overflow: hidden; position: relative;'>New Card</button></div>"
+    //columnsHTML += "<div style='order: 100000;width: 95%; margin: auto;'><button class='board_item_button w100' onclick='menu_create_item(\"" + columnID +"\")' style='overflow: hidden; position: relative;'>New Card</button></div>"
     columnsHTML += "<div class='column_footer' onclick='menu_create_item(\"" + columnID + "\")'>+ Add new card</div>"
     columnsHTML += "</div></div>"
 
@@ -626,7 +626,7 @@ export function context_menu_column_options(columnID) {
     context_menu.style.display = 'block'
     setCurrContextMenu('context_options-' + columnID)
     context_menu.innerHTML = "<button class='context_options_btn' onclick='menu_rename_column(\"" + columnID + "\")'>Rename list</button>"
-    context_menu.innerHTML += "<button class='context_options_btn' onclick='menu_create_column_item(\"" + columnID + "\")'>Add new card</button>"
+    context_menu.innerHTML += "<button class='context_options_btn' onclick='menu_create_item(\"" + columnID + "\")'>Add new card</button>"
     // context_menu.innerHTML += "<button class='context_options_btn' onclick='contextmenu_move_column(\"" + columnID + "\")'>Move List...</button>"
     context_menu.innerHTML += "<button class='context_options_btn' onclick='btn_remove_column(\"" + columnID + "\")' style='color:red;'>Delete</button>"
     setOverlayIsActive(true)
