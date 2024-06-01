@@ -5,7 +5,7 @@
 import {
     closeOverlay,
     setScenario,
-    showPreview2,
+    showPreview,
     onBackPressed,
     btnBridge,
     showQR,
@@ -471,6 +471,7 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     pl.insertRow(pl.rows.length).innerHTML = row;
 }
 
+window.load_chat = load_chat;
 export function load_chat(nm) {
     var ch, pl, e;
     ch = tremola.chats[nm]
@@ -576,7 +577,7 @@ async function load_chat_item(nm) { // appends a button for conversation with na
         textSize = '15px';
     }
 
-    row = "<button class='chat_item_button w100" + bg + "' style='overflow: hidden; position: relative; height: " + height + ";'>";
+    row = "<button class='chat_item_button w100" + bg + "' onclick='load_chat(\"" + nm + "\");' style='overflow: hidden; position: relative; height: " + height + ";'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden; font-size: " + textSize + ";'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size='" + fontsize + "'>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
@@ -590,14 +591,6 @@ async function load_chat_item(nm) { // appends a button for conversation with na
     item.innerHTML = row;
 
     cl.appendChild(item);
-
-    // Get the newly created button element
-    var button = item.querySelector('button.chat_item_button');
-
-    // Assign the load_chat function to the onclick event handler of the button
-    button.onclick = function() {
-        load_chat(nm);
-    };
 
     set_chats_badge(nm)
 }
@@ -630,7 +623,7 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
     // console.log("load_c_i", JSON.stringify(c[1]))
     bg = c[1].forgotten ? ' gray' : ' light';
     row = "<button class=contact_picture style='margin-right: 0.75em; background: " + c[1].color + ";'>" + c[1].initial + "</button>";
-    row += "<button id='" + strid + "' class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);'>";
+    row += "<button id='" + strid + "' class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);' onclick='show_contact_details(\"" + c[0] + "\");'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + escapeHTML(c[1].alias) + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + c[0] + "</font></div></div></button>";
     // var row  = "<td><button class=contact_picture></button><td style='padding: 5px;'><button class='contact_item_button light w100'>";
@@ -642,18 +635,6 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
 
     item.innerHTML = row;
     document.getElementById('lst:contacts').appendChild(item);
-    initshowcontactdetails(c)
-}
-
-function initshowcontactdetails(c) {
-    //console.log(c)
-    var strid = `show-contact-details${c[0]}`
-    var showcontactdetails = document.getElementById(strid);
-    // Assign the load_chat function to the onclick event handler of the button
-    showcontactdetails.onclick = function() {
-        show_contact_details("" + c[0] + "");
-    };
-    //console.log('Assigned onclick to:',c[0])
 }
 
 export function fill_members() {
@@ -675,6 +656,7 @@ export function fill_members() {
     document.getElementById(myId).disabled = true;
 }
 
+window.show_contact_details = show_contact_details;
 function show_contact_details(id) {
 
     if (id == myId) {
@@ -713,6 +695,7 @@ function toggle_forget_contact(e) {
     load_contact_list();
 }
 
+window.save_content_alias = save_content_alias;
 export function save_content_alias() {
     var c = tremola.contacts[new_contact_id];
     var val = document.getElementById('old_contact_alias').value;
@@ -938,79 +921,6 @@ function import_id(json_str) {
 }
 
 function initializeAllButtons() {
-    var prevbutton = document.getElementById('btn:preview');
-    prevbutton.onclick = function() {
-        showPreview2();
-    };
-    // var backbutton = document.getElementById('back');
-    // backbutton.onclick = function() {
-    //     onBackPressed();
-    // };
-    var btnchats = document.getElementById('btn:chats');
-    btnchats.onclick = function() {
-        btnBridge(this);
-    };
-    var btnkanban = document.getElementById('btn:kanban');
-    btnkanban.onclick = function() {
-        btnBridge(this);
-    };
-    var btncontacts = document.getElementById('btn:contacts');
-    btncontacts.onclick = function() {
-        btnBridge(this);
-    };
-    var btnattach = document.getElementById('btn:attach');
-    btnattach.onclick = function() {
-        btnBridge(this);
-    };
-    var btnmenu = document.getElementById('btn:menu');
-    btnmenu.onclick = function() {
-        btnBridge(this);
-    };
-    var divqr = document.getElementById('btn:qr');
-    divqr.onclick = function() {
-        console.log('Assigning qrButton...')
-        showQR();
-    };
-    var overlaybg = document.getElementById('overlay-bg');
-    overlaybg.onclick = function() {
-        closeOverlay();
-    };
-    var overlaytrans = document.getElementById('overlay-trans');
-    overlaytrans.onclick = function() {
-        closeOverlay();
-    };
-    var overlaybgcore = document.getElementById('overlay-bg-core');
-    overlaybgcore.onclick = function() {
-        closeOverlay();
-    };
-    var overlaytranscore = document.getElementById('overlay-trans-core');
-    overlaytranscore.onclick = function() {
-        closeOverlay();
-    };
-    var btncreatepersonalboardaccept = document.getElementById('btn:create_personal_board_accept');
-    btncreatepersonalboardaccept.onclick = function() {
-        btn_create_personal_board_accept();
-    };
-    var btncreatepersonalboarddecline = document.getElementById('btn:create_personal_board_decline');
-    btncreatepersonalboarddecline.onclick = function() {
-        btn_create_personal_board_decline();
-    };
-    var savecontentalias = document.getElementById('save-content-alias');
-    savecontentalias.onclick = function() {
-        save_content_alias();
-    };
-    var plusbutton = document.getElementById('plus-button');
-    plusbutton.onclick = function() {
-        plus_button();
-    };
-    var qrscanstart = document.getElementById('qr-scan-start');
-    qrscanstart.onclick = function() {
-        qr_scan_start(QR_SCAN_TARGET.ADD_CONTACT);
-    };
-    var qrscansuccess = document.getElementById('qr-scan-success');
-    qrscansuccess.onclick = function() {
-        qr_scan_success(document.getElementById('contact_id').value);
-    };
     var membersconfirmed = document.getElementById('members-confirmed');
     membersconfirmed.onclick = function() {
         members_confirmed()

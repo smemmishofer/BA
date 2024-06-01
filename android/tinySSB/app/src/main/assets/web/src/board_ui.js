@@ -164,11 +164,13 @@ export function menu_create_personal_board() {
     document.getElementById('overlay-trans-core').style.display = 'initial'
 }
 
+window.btn_create_personal_board_accept = btn_create_personal_board_accept;
 export function btn_create_personal_board_accept() {
     create_personal_board()
     closeOverlay()
 }
 
+window.btn_create_personal_board_decline = btn_create_personal_board_decline;
 export function btn_create_personal_board_decline() {
     closeOverlay()
     display_create_personal_board = false

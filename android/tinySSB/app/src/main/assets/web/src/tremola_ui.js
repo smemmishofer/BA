@@ -219,6 +219,7 @@ export function setScenario(s) {
     }
 }
 
+window.btnBridge = btnBridge;
 export function btnBridge(e) {
     var e = e.id, m = '';
     if (['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex', 'btn:kanban'].indexOf(e) >= 0) {
@@ -274,6 +275,7 @@ export function menu_settings() {
     c.innerHTML = "<div style='text-align: center;'><font size=+1><strong>Settings</strong></font></div>";
 }
 
+window.closeOverlay = closeOverlay;
 export function closeOverlay() {
     document.getElementById('menu').style.display = 'none';
     document.getElementById('qr-overlay').style.display = 'none';
@@ -315,7 +317,8 @@ export function closeOverlay() {
     }
 }
 
-export function showPreview2() {
+window.showPreview = showPreview;
+export function showPreview() {
     var draft = escapeHTML(document.getElementById('draft').value);
     if (draft.length == 0) return;
     if (!getSetting("enable_preview")) {
@@ -339,6 +342,7 @@ export function menu_about() {
     overlayIsActive = true;
 }
 
+window.plus_button = plus_button;
 export function plus_button() {
     closeOverlay();
     if (curr_scenario == 'chats') {
@@ -363,6 +367,7 @@ export function launch_snackbar(txt) {
 
 // --- QR display and scan
 
+window.showQR = showQR;
 export function showQR() {
     generateQR('did:ssb:ed25519:' + myId.substring(1).split('.')[0])
 }
@@ -390,7 +395,7 @@ export function generateQR(s) {
     overlayIsActive = true;
 }
 
-
+window.qr_scan_start = qr_scan_start;
 export function qr_scan_start(target) {
     // test if Android is defined ...
     curr_qr_scan_target = target
@@ -398,6 +403,7 @@ export function qr_scan_start(target) {
     closeOverlay();
 }
 
+window.qr_scan_success = qr_scan_success;
 export function qr_scan_success(s) {
     closeOverlay();
     switch (curr_qr_scan_target) {
