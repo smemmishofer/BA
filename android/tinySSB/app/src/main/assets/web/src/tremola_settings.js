@@ -19,6 +19,7 @@ export function get_default_settings() {
     }
 }
 
+window.toggle_changed = toggle_changed;
 export function toggle_changed(e) {
     // console.log("toggle ", e.id);
     tremola.settings[e.id] = e.checked;
@@ -102,6 +103,7 @@ function enter_setWebsocketUrl(ev) {
     }
 }
 
+window.settings_restream_posts = settings_restream_posts;
 export function settings_restream_posts() {
     // closeOverlay();
     setScenario('chats')
@@ -109,6 +111,7 @@ export function settings_restream_posts() {
     backend("restream");
 }
 
+window.settings_reset_ui = settings_reset_ui;
 export function settings_reset_ui() {
     closeOverlay();
     resetTremola();
@@ -118,6 +121,7 @@ export function settings_reset_ui() {
     backend("reset");
 }
 
+window.settings_clear_other_feeds = settings_clear_other_feeds;
 export function settings_clear_other_feeds() {
     backend("wipe:others")
     closeOverlay()

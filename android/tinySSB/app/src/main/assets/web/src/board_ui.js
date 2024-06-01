@@ -122,7 +122,7 @@ export function load_board_list() {
             item = document.createElement('div');
             item.setAttribute('style', "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;");
             if (board.forgotten) bg = ' gray'; else bg = ' light';
-            row = "<button class='board_item_button w100" + bg + "' style='overflow: hidden; position: relative;'>";
+            row = "<button class='board_item_button w100" + bg + "' onclick='load_board(\"" + bid + "\");' style='overflow: hidden; position: relative;'>";
             row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + board.name + "</div>";
             row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + ", </font><font size=-3>last changed: " + date + "</font> </div></div>";
             badgeId = bid + "-badge_board"
@@ -132,11 +132,6 @@ export function load_board_list() {
             item.innerHTML = row;
             cl.appendChild(item);
             ui_set_board_list_badge(bid)
-
-            var button = item.querySelector('button.board_item_button');
-            button.onclick = function() {
-                load_board(bid);
-            };
         }
     }
 }
@@ -176,6 +171,7 @@ export function btn_create_personal_board_decline() {
     display_create_personal_board = false
 }
 
+window.load_board = load_board;
 export function load_board(bid) { //switches scene to board and changes title to board name
     console.log('loading board: ', bid)
     setCurrBoard(bid)

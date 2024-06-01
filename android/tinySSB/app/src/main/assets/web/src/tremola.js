@@ -168,6 +168,7 @@ export function menu_edit(target, title, text) {
     edit_target = target;
 }
 
+window.onEnter = onEnter;
 export function onEnter(ev) {
 
     if (ev.key == "Enter") {
@@ -193,6 +194,7 @@ function menu_edit_convname() {
 //   menu_edit('new_contact_alias', "Assign alias to new contact:", "");
 // }
 
+window.edit_confirmed = edit_confirmed;
 export function edit_confirmed() {
     closeOverlay()
     console.log("edit confirmed: " + edit_target)
@@ -284,6 +286,7 @@ export function edit_confirmed() {
     }
 }
 
+window.members_confirmed = members_confirmed;
 export function members_confirmed() {
     if (getPrevScenario() == 'chats') {
         new_conversation()
@@ -671,7 +674,7 @@ function show_contact_details(id) {
     details += '<br><div>IAM-Alias: &nbsp;' + (c.iam != "" ? c.iam : "&mdash;") + '</div>\n';
     details += '<br><div>Shortname: &nbsp;' + id2b32(id) + '</div>\n';
     details += '<br><div style="word-break: break-all;">SSB identity: &nbsp;<tt>' + id + '</tt></div>\n';
-    details += '<br><div class=settings style="padding: 0px;"><div class=settingsText>Forget this contact</div><div style="float: right;"><label class="switch"><input id="hide_contact" type="checkbox"><span class="slider round"></span></label></div></div>'
+    details += '<br><div class=settings style="padding: 0px;"><div class=settingsText>Forget this contact</div><div style="float: right;"><label class="switch"><input id="hide_contact" type="checkbox" onchange="toggle_forget_contact(this);"><span class="slider round"></span></label></div></div>'
     document.getElementById('old_contact_details').innerHTML = details;
     document.getElementById('old_contact-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
@@ -679,14 +682,9 @@ function show_contact_details(id) {
 
     document.getElementById('old_contact_alias').focus();
     setOverlayIsActive(true)
-    //TODO: Maybe de-comment this again later...
-    //hideContactOnChange(this)
 }
 
-function hideContactOnChange(a) {
-    toggle_forget_contact(a);
-}
-
+window.toggle_forget_contact = toggle_forget_contact;
 function toggle_forget_contact(e) {
     var c = tremola.contacts[new_contact_id];
     c.forgotten = !c.forgotten;
@@ -920,77 +918,6 @@ function import_id(json_str) {
     return true
 }
 
-function initializeAllButtons() {
-    var membersconfirmed = document.getElementById('members-confirmed');
-    membersconfirmed.onclick = function() {
-        members_confirmed()
-    };
-    var editconfirmed = document.getElementById('edit-confirmed');
-    editconfirmed.onclick = function() {
-        edit_confirmed()
-    };
-    var edittext = document.getElementById('edit_text');
-    edittext.onkeypress = function () {
-        onEnter(event)
-    }
-    var importidinput = document.getElementById('import-id-input');
-    importidinput.onkeypress = function () {
-        onEnter(event)
-    }
-    var settingsurlInput = document.getElementById('settings_urlInput');
-    settingsurlInput.onkeypress = function () {
-        onEnter(event)
-    }
-    var ble = document.getElementById('ble');
-    ble.onchange = function () {
-        toggle_changed(this)
-    }
-    var udp_multicast = document.getElementById('udp_multicast');
-    udp_multicast.onchange = function () {
-        toggle_changed(this)
-    }
-    var websocket = document.getElementById('websocket');
-    websocket.onchange = function () {
-        toggle_changed(this)
-    }
-    var enable_preview = document.getElementById('enable_preview');
-    enable_preview.onchange = function () {
-        toggle_changed(this)
-    }
-    var hide_forgotten_contacts = document.getElementById('hide_forgotten_contacts');
-    hide_forgotten_contacts.onchange = function () {
-        toggle_changed(this)
-    }
-    var hide_forgotten_boards = document.getElementById('hide_forgotten_boards');
-    hide_forgotten_boards.onchange = function () {
-        toggle_changed(this)
-    }
-    var hide_forgotten_conv = document.getElementById('hide_forgotten_conv');
-    hide_forgotten_conv.onchange = function () {
-        toggle_changed(this)
-    }
-    var show_shortnames = document.getElementById('show_shortnames');
-    show_shortnames.onchange = function () {
-        toggle_changed(this)
-    }
-    var background_map = document.getElementById('background_map');
-    background_map.onchange = function () {
-        toggle_changed(this)
-    }
-    var settingsrestreamposts = document.getElementById('settings_restream_posts');
-    settingsrestreamposts.onclick = function () {
-        settings_restream_posts();
-    }
-    var settingsresetui = document.getElementById('settings_reset_ui');
-    settingsresetui.onclick = function () {
-        settings_reset_ui();
-    }
-    var settingsclearotherfeeds = document.getElementById('settings_clear_other_feeds');
-    settingsclearotherfeeds.onclick = function () {
-        settings_clear_other_feeds();
-    }
-}
-
 export function assignMenuOnClick() {
     const btns = document.querySelectorAll('.menu_item_button')
     btns.forEach(function(btn){
@@ -1084,8 +1011,6 @@ async function main () {
     if (process.platform === 'ios') {
         adjustFormatToIOS()
     }
-
-    initializeAllButtons()
 
     delRepo()
     // load everything again from the file system (source of "truth")
