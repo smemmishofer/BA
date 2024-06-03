@@ -169,6 +169,7 @@ export function renameItem(bid, iid, new_name) {
     board_send_to_backend(data)
 }
 
+window.moveItem = moveItem;
 export function moveItem(bid, iid, new_cid) {
     var board = tremola.board[bid]
     var data = {

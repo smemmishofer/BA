@@ -33,7 +33,7 @@ export async function loadRepo() {
     console.error('cannot access repo path');
     console.log('making new directory...')
     try {
-      await fs.mkdir(repoPath)
+      await fs.mkdir(repoPath, { recursive: true })
     } catch (err) {
       console.log('error making directory: ', err, 'directory-path: ', repoPath)
     }

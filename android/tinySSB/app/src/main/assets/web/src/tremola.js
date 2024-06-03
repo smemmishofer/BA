@@ -1414,25 +1414,6 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
 
         await appendContent(r, ebipf)
 
-        //TODO: Continue here/ Fix this
-        //const read_e = await readContent(r, r.logEntries.length -1);
-        //const read_e = await readContent(r, 0);
-
-        //console.log('Whole array of log entries: ', decode(readAllContent(r)))
-        /*for (const [key, value] of Object.entries(getReplicas())) {
-            const r = value;
-            console.log('replica key: ', key);
-            console.log('replica value: ', r);
-            for (const entry of r.logEntries) {
-                if (entry) {
-                    console.log('decoded content: ', decode(entry, 0));
-                }
-            }
-        }
-*/
-        // Restream bei Start-Up machen, mit leerem Tremola-Objekt und danach auffüllen mit Restream
-        //TODO: Implement "restream" --> See backend("restream"); in settings_restream_posts() method!
-
         //TODO: hier wieder einkommentieren!!
         b2f_new_event(e)
         //sendP2P(e.public)
@@ -1495,7 +1476,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
     }
 
     else {
-        console.log('backend', JSON.stringify(cmdStr))
+        console.log('backend; command not implemented: ', JSON.stringify(cmdStr))
     }
 }
 
