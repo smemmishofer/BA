@@ -129,6 +129,7 @@ export function menu_new_conversation() {
     closeOverlay();
 }
 
+window.menu_new_contact = menu_new_contact;
 export function menu_new_contact() {
     document.getElementById('new_contact-overlay').style.display = 'initial';
     document.getElementById('overlay-bg').style.display = 'initial';
@@ -136,10 +137,12 @@ export function menu_new_contact() {
     setOverlayIsActive(true)
 }
 
+window.menu_new_pub = menu_new_pub;
 export function menu_new_pub() {
     menu_edit('new_pub_target', "Enter address of trustworthy pub<br><br>Format:<br><tt>net:IP_ADDR:PORT~shs:ID_OF_PUB</tt>", "");
 }
 
+window.menu_invite = menu_invite;
 function menu_invite() {
     menu_edit('new_invite_target', "Enter invite code<br><br>Format:<br><tt>IP_ADDR:PORT:@ID_OF_PUB.ed25519~INVITE_CODE</tt>", "");
 }
@@ -186,6 +189,7 @@ export function onEnter(ev) {
     }
 }
 
+window.menu_edit_convname = menu_edit_convname;
 function menu_edit_convname() {
     menu_edit('convNameTarget', "Edit conversation name:<br>(only you can see this name)", tremola.chats[curr_chat].alias);
 }
@@ -295,6 +299,7 @@ export function members_confirmed() {
     }
 }
 
+window.menu_forget_conv = menu_forget_conv;
 function menu_forget_conv() {
     // toggles the forgotten flag of a conversation
     if (curr_chat == recps2nm([myId])) {
@@ -918,16 +923,6 @@ function import_id(json_str) {
     return true
 }
 
-export function assignMenuOnClick() {
-    const btns = document.querySelectorAll('.menu_item_button')
-    btns.forEach(function(btn){
-        var button = document.getElementById(btn.id);
-        button.onclick = function () {
-            eval(btn.id + "()");
-        }
-    })
-}
-
 // --- Interface to Kotlin side and local (browser) storage
 
 // Changes for socket library
@@ -993,7 +988,7 @@ async function main () {
     await initP2P()
     initP2P().then(() => {
         try {
-            cats.on('mew', buf => {
+            p2pnetwork.on('vector', buf => {
                 //console.log('before decoding text: ', buf)
 
                 var string = new TextDecoder().decode(buf.data);
@@ -1194,7 +1189,7 @@ function adjustFormatToIOS() {
 
 // Try out socket P2P functionality:
 // (identical code as in 'P2P Guide')
-let cats;
+let p2pnetwork;
 
 async function initP2P() {
     try {
@@ -1222,7 +1217,7 @@ async function initP2P() {
 //
 // Create a subcluster (a partition within your cluster)
 //
-        cats = await socket.subcluster({ sharedKey })
+        p2pnetwork = await socket.subcluster({ sharedKey })
     } catch (err) {
         console.log('Error while initializing P2P')
         console.error(err)
@@ -1357,7 +1352,7 @@ async function receiveP2P(vector) {
 export function sendP2P(msg) {
     try {
         if (msg != null) {
-            cats.emit('mew', Buffer.from(JSON.stringify(msg)))
+            p2pnetwork.emit('vector', Buffer.from(JSON.stringify(msg)))
             console.log('msg emitted into P2P network: ', Buffer.from(JSON.stringify(msg)))
         } else {
             console.log('msg length is 0 !!')
@@ -1409,14 +1404,10 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         var ebipf = allocAndEncode(e)
         await createReplica(tremola.id)
         var r = await fid2replica(tremola.id)
-        //if(replicas)
-            //TODO: Continue here
 
         await appendContent(r, ebipf)
 
-        //TODO: hier wieder einkommentieren!!
         b2f_new_event(e)
-        //sendP2P(e.public)
     } else if (cmdStr[0] == 'kanban') {
         console.log('backend, kanban: ', cmdStr)
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]

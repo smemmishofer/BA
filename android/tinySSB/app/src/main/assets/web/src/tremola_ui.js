@@ -221,11 +221,13 @@ export function setScenario(s) {
 
 window.btnBridge = btnBridge;
 export function btnBridge(e) {
+    console.log('DEBUG 2!!!')
     var e = e.id, m = '';
     if (['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex', 'btn:kanban'].indexOf(e) >= 0) {
         setScenario(e.substring(4));
     }
     if (e == 'btn:menu') {
+        console.log('DEBUG')
         if (scenarioMenu[curr_scenario].length == 0)
             return;
         document.getElementById("menu").style.display = 'initial';
@@ -236,12 +238,11 @@ export function btnBridge(e) {
             } else {
                 m += "<button class=menu_item_button ";
             }
-            m += "id='" + e[1] + "'>" + e[0] + "</button><br>";
+            m += "onclick='" + e[1] + "();'>" + e[0] + "</button><br>";
         })
         m = m.substring(0, m.length - 4);
         // console.log(curr_scenario + ' menu! ' + m);
         document.getElementById("menu").innerHTML = m;
-        assignMenuOnClick()
         return;
     }
     if (e == 'btn:attach') {
@@ -254,6 +255,7 @@ export function btnBridge(e) {
     // if (typeof Android != "undefined") { Android.onFrontendRequest(e); }
 }
 
+window.menu_settings = menu_settings;
 export function menu_settings() {
     closeOverlay();
     setScenario('settings')
@@ -335,6 +337,7 @@ export function showPreview() {
     overlayIsActive = true;
 }
 
+window.menu_about = menu_about;
 export function menu_about() {
     closeOverlay()
     document.getElementById('about-overlay').style.display = 'initial';
@@ -477,6 +480,7 @@ function modal_img(img) {
     );
 }
 
+window.menu_connection = menu_connection;
 export function menu_connection() {
     closeOverlay();
     //refresh_connection_progressbar()

@@ -359,6 +359,7 @@ export function history_sort_select(obj) {
     }
 }
 
+window.menu_board_invitations = menu_board_invitations;
 export function menu_board_invitations() {
     closeOverlay()
     document.getElementById("kanban-invitations-overlay").style.display = 'initial';
@@ -434,6 +435,7 @@ export function btn_invite_decline(bid) {
         inv.outerHTML = ""
 }
 
+window.menu_new_board = menu_new_board;
 export function menu_new_board() {
     closeOverlay()
     fill_members();
@@ -475,6 +477,7 @@ export function ui_update_board_title(bid) {
     }
 }
 
+window.board_toggle_forget = board_toggle_forget;
 export function board_toggle_forget() {
     var board = tremola.board[curr_board]
     board.forgotten = !board.forgotten
@@ -484,6 +487,7 @@ export function board_toggle_forget() {
     setScenario('kanban')
 }
 
+window.menu_invite = menu_invite;
 export function menu_invite() {
     var board = tremola.board[curr_board]
     closeOverlay()
@@ -575,6 +579,7 @@ export function leave_curr_board() {
 /*
   Columns
 */
+window.menu_new_column = menu_new_column;
 export function menu_new_column() {
     menu_edit("board_new_column", "Enter name of new List: ", "")
 }
