@@ -923,6 +923,16 @@ function import_id(json_str) {
     return true
 }
 
+export function assignMenuOnClick() {
+    const btns = document.querySelectorAll('.menu_item_button')
+    btns.forEach(function(btn){
+        var button = document.getElementById(btn.id);
+        button.onclick = function () {
+            eval(btn.id + "()");
+        }
+    })
+}
+
 // --- Interface to Kotlin side and local (browser) storage
 
 // Changes for socket library
