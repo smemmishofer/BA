@@ -993,7 +993,7 @@ async function main () {
     await initP2P()
     initP2P().then(() => {
         try {
-            cats.on('mew', buf => {
+            p2pnetwork.on('vector', buf => {
                 //console.log('before decoding text: ', buf)
 
                 var string = new TextDecoder().decode(buf.data);
@@ -1137,48 +1137,48 @@ function adjustFormatToIOS() {
     console.log('Adjusting format to ios')
 
     var e = document.getElementById('main_division')
-    e.style.marginTop = '150px'
+    e.style.marginTop = '70px'
 
     var e = document.getElementById('menu')
-    e.style.marginTop = '150px'
+    e.style.marginTop = '70px'
 
-    var e = document.getElementById('btn:menu')
-    var fontElement = e.querySelector('font');
-    fontElement.style.fontSize = '60px'
-
-    var e = document.getElementById('div:qr')
-    var fontElement = e.querySelector('font');
-    fontElement.style.fontSize = '60px'
-
-    var e = document.getElementById('tremolaTitle')
-    var fontElement = e.querySelector('font');
-    fontElement.style.fontSize = '60px'
-
-    var e = document.getElementById('div:back')
-    e.style.height = '60px'
-    e.style.width = '60px'
-
-    var e = document.getElementById('back')
-    e.style.height = '60px'
-    e.style.width = '60px'
-
-    var e = document.getElementById('hdr')
-    e.style.height = '75px'
-
-    var e = document.getElementById('conversationTitle')
-    e.style.fontSize = '30px'
-
+    // var e = document.getElementById('btn:menu')
+    // var fontElement = e.querySelector('font');
+    // fontElement.style.fontSize = '60px'
+    //
+    // var e = document.getElementById('div:qr')
+    // var fontElement = e.querySelector('font');
+    // fontElement.style.fontSize = '60px'
+    //
+    // var e = document.getElementById('tremolaTitle')
+    // var fontElement = e.querySelector('font');
+    // fontElement.style.fontSize = '60px'
+    //
+    // var e = document.getElementById('div:back')
+    // e.style.height = '60px'
+    // e.style.width = '60px'
+    //
+    // var e = document.getElementById('back')
+    // e.style.height = '60px'
+    // e.style.width = '60px'
+    //
+    // var e = document.getElementById('hdr')
+    // e.style.height = '75px'
+    //
+    // var e = document.getElementById('conversationTitle')
+    // e.style.fontSize = '30px'
+    //
     var e = document.getElementById('draft')
     e.style.fontSize = '40px'
 
     var e = document.getElementById('draft')
     var f = document.getElementById('core')
-    f.style.marginBottom = '-100px'
+    //f.style.marginBottom = '-100px'
     e.addEventListener('focus', function() {
-        f.style.marginBottom = '-890px'
+        f.style.marginBottom = '-450px'
     })
     e.addEventListener('blur', function() {
-        f.style.marginBottom = '-100px'
+        f.style.marginBottom = '0px'
     })
 
     // var e = document.getElementById('core')
@@ -1194,7 +1194,7 @@ function adjustFormatToIOS() {
 
 // Try out socket P2P functionality:
 // (identical code as in 'P2P Guide')
-let cats;
+let p2pnetwork;
 
 async function initP2P() {
     try {
@@ -1222,7 +1222,7 @@ async function initP2P() {
 //
 // Create a subcluster (a partition within your cluster)
 //
-        cats = await socket.subcluster({ sharedKey })
+        p2pnetwork = await socket.subcluster({ sharedKey })
     } catch (err) {
         console.log('Error while initializing P2P')
         console.error(err)
@@ -1357,7 +1357,7 @@ async function receiveP2P(vector) {
 export function sendP2P(msg) {
     try {
         if (msg != null) {
-            cats.emit('mew', Buffer.from(JSON.stringify(msg)))
+            p2pnetwork.emit('vector', Buffer.from(JSON.stringify(msg)))
             console.log('msg emitted into P2P network: ', Buffer.from(JSON.stringify(msg)))
         } else {
             console.log('msg length is 0 !!')
