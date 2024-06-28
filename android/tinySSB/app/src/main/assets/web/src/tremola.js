@@ -958,9 +958,9 @@ async function main () {
             console.log('decoding message...')
             var string = new TextDecoder().decode(msg);
             console.log('string before parsing: ', string)
-            var vector = JSON.parse(string)
-            //console.log('Received new P2P message: ', vector)
-            receiveP2P(vector)
+            var message = JSON.parse(string)
+            //console.log('Received new P2P message: ', message)
+            receiveP2P(message)
         })
         incomingsocket.on('error', (err) => {
             console.error('UDP socket error:', err);
@@ -988,15 +988,15 @@ async function main () {
     await initP2P()
     initP2P().then(() => {
         try {
-            p2pnetwork.on('vector', buf => {
+            p2pnetwork.on('message', buf => {
                 //console.log('before decoding text: ', buf)
 
                 var string = new TextDecoder().decode(buf.data);
-                var vector = JSON.parse(string)
+                var message = JSON.parse(string)
                 //console.log('Received P2P before decoding: ', string)
-                console.log('Received new P2P message: ', vector)
-                //TODO: Call receiveP2P() method here with the decoded string (want-or data-vector) !!!
-                receiveP2P(vector)
+                console.log('Received new P2P message: ', message)
+                //TODO: Call receiveP2P() method here with the decoded string (want-vector or data-packet) !!!
+                receiveP2P(message)
             })
         } catch (err) {
             console.error(err)
@@ -1069,8 +1069,6 @@ function findAndRemoveTremolaItems() {
 
 function sendWantVector() {
     try {
-        console.log('WANT-vector sent from worker-thread')
-
         const replicas = getReplicas()
 
         const wantVec = generateWantVector(replicas)
@@ -1243,12 +1241,10 @@ export function generateWantVector(replicas) {
     return wantVec;
 }
 
-async function receiveP2P(vector) {
-    //console.log('vector: ', vector)
-
-    if (vector.type == 'v') {
-        console.log('vector is a want vector')
-        var fidSeqNrMap = vector.content
+async function receiveP2P(message) {
+    if (message.type == 'v') {
+        console.log('message is a want vector')
+        var fidSeqNrMap = message.content
         var replicas = getReplicas()
         //console.log('replicas: ', replicas)
 
@@ -1260,13 +1256,12 @@ async function receiveP2P(vector) {
             if (fid in replicas) {
                 var mostRecentEntry = replicas[fid].logEntries.length
                 if (mostRecentEntry >= desiredEntry) {
-                    //TODO: Send LogEntry in 'data'-vector
+                    //TODO: Send LogEntry in 'data'-packet
 
                     // -1, because logEntries is an array and if it has 1 element, we want the one at pos. 0
-                    // TODO: Test, ob sequenznummern stimmen!
                     const entryToSend = replicas[fid].logEntries[desiredEntry -1]
-                    const dataVec = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:decode(entryToSend, 0) } };
-                    //TODO: send dataVec over P2P!!
+                    const dataPacket = { type:'d', content: { fid:fid, seqNr:desiredEntry, entry:decode(entryToSend, 0) } };
+                    //TODO: send dataPacket over P2P!!
                     let port = 50003;
                     if (process.env.USERNAME === 'Alice') {
                         port = 50001
@@ -1287,7 +1282,7 @@ async function receiveP2P(vector) {
                         ipadr = '192.168.1.130'
                     }
 
-                    var msg = Buffer.from(JSON.stringify(dataVec))
+                    var msg = Buffer.from(JSON.stringify(dataPacket))
                     if (process.env.MODE === 'web') {
                         try {
                             outgoingsocket.send(msg, port, ipadr, (err) => {
@@ -1304,12 +1299,12 @@ async function receiveP2P(vector) {
                             console.error(err)
                         }
                     } else {
-                        sendP2P(dataVec)
+                        sendP2P(dataPacket)
                     }
 
                     console.log('send data packet with number: ', desiredEntry)
-                    console.log('data vector to send: ', dataVec)
-                    console.log('corresponding log entry: ', dataVec.content.entry)
+                    console.log('data message to send: ', dataPacket)
+                    console.log('corresponding log entry: ', dataPacket.content.entry)
                     // then return because we only send 1 packet
                     return;
                 }
@@ -1318,41 +1313,41 @@ async function receiveP2P(vector) {
 
         // If we are here, we have not found a fitting entry
         console.log('no fitting entry found; either we dont have the fid or we dont have a new packet')
-    } else if (vector.type == 'd') {
+    } else if (message.type == 'd') {
         //TODO: append new log entry to file system, if seq.Nr. is matching...
-        console.log('vector is a data vector')
+        console.log('message is a data packet')
 
         replicas = getReplicas()
-        if (vector.content.fid in replicas) {
-            var r = replicas[vector.content.fid]
+        if (message.content.fid in replicas) {
+            var r = replicas[message.content.fid]
             var currSeqNr = r.logEntries.length
-            console.log('FID from Data vector found in file system')
+            console.log('FID from Data packet found in file system')
 
             // Append only if seqNr matches exactly!!
-            if (vector.content.seqNr === currSeqNr + 1) {
-                console.log('raw data: ', vector.content.entry)
-                var ebipf = allocAndEncode(vector.content.entry)
+            if (message.content.seqNr === currSeqNr + 1) {
+                console.log('raw data: ', message.content.entry)
+                var ebipf = allocAndEncode(message.content.entry)
                 await appendContent(r, ebipf)
-                console.log('appending logEntry to fid: ', vector.content.fid)
+                console.log('appending logEntry to fid: ', message.content.fid)
 
                 // TODO: UI aktualisieren mit neuem Log-Eintrag...
-                b2f_new_event(vector.content.entry)
+                b2f_new_event(message.content.entry)
             } else {
                 console.log('not appending logEntry because Seq.Nr. is not matching!')
             }
         } else {
             // do nothing, as we don't have the fid in our replica object / content list...
-            console.log('vector not appended, because no matching FID was found!')
+            console.log('message not appended, because no matching FID was found!')
         }
     } else {
-        console.error('vector is of unkonwn format')
+        console.error('message is of unkonwn format')
     }
 }
 
 export function sendP2P(msg) {
     try {
         if (msg != null) {
-            p2pnetwork.emit('vector', Buffer.from(JSON.stringify(msg)))
+            p2pnetwork.emit('message', Buffer.from(JSON.stringify(msg)))
             console.log('msg emitted into P2P network: ', Buffer.from(JSON.stringify(msg)))
         } else {
             console.log('msg length is 0 !!')
