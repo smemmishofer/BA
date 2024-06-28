@@ -238,11 +238,12 @@ export function btnBridge(e) {
             } else {
                 m += "<button class=menu_item_button ";
             }
-            m += "onclick='" + e[1] + "();'>" + e[0] + "</button><br>";
+            m += "id='" + e[1] + "'>" + e[0] + "</button><br>";
         })
         m = m.substring(0, m.length - 4);
         // console.log(curr_scenario + ' menu! ' + m);
         document.getElementById("menu").innerHTML = m;
+        assignMenuOnClick()
         return;
     }
     if (e == 'btn:attach') {
