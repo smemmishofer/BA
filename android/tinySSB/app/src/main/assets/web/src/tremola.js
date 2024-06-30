@@ -228,12 +228,12 @@ export function edit_confirmed() {
         };
         */
         persist();
-        backend("add:contact " + new_contact_id + " " + btoa(val))
+        custombackend("add:contact " + new_contact_id + " " + btoa(val))
         menu_redraw();
     } else if (edit_target == 'new_pub_target') {
         console.log("action for new_pub_target")
     } else if (edit_target == 'new_invite_target') {
-        backend("invite:redeem " + val)
+        custombackend("invite:redeem " + val)
     } else if (edit_target == 'new_board') {
         console.log("action for new_board")
         if (val == '') {
@@ -335,7 +335,7 @@ function btn_import_id() {
 }
 
 function menu_process_msgs() {
-    backend('process.msg');
+    custombackend('process.msg');
     closeOverlay();
 }
 
@@ -345,7 +345,7 @@ function menu_add_pub() {
 }
 
 function menu_dump() {
-    backend('dump:');
+    custombackend('dump:');
     closeOverlay();
 }
 
@@ -358,12 +358,12 @@ function menu_take_picture() {
     else
         draft = atob(draft);
     console.log("getVoice" + document.getElementById('draft').value);
-    backend('get:voice ' + atob(draft));
+    custombackend('get:voice ' + atob(draft));
 }
 
 function menu_pick_image() {
     closeOverlay();
-    backend('get:media');
+    custombackend('get:media');
 }
 
 // ---
@@ -376,10 +376,10 @@ export function new_text_post(s) {
     var recps;
     if (curr_chat == "ALL") {
         recps = "ALL";
-        backend("publ:post [] " + btoa(draft) + " null"); //  + recps)
+        custombackend("publ:post [] " + btoa(draft) + " null"); //  + recps)
     } else {
         recps = tremola.chats[curr_chat].members.join(' ');
-        backend("priv:post [] " + btoa(draft) + " null " + recps);
+        custombackend("priv:post [] " + btoa(draft) + " null " + recps);
     }
     document.getElementById('draft').value = '';
     closeOverlay();
@@ -397,10 +397,10 @@ function new_voice_post(voice_b64) {
         draft = btoa(draft)
     if (curr_chat == "ALL") {
         // recps = "ALL";
-        backend("publ:post [] " + draft + " " + voice_b64); //  + recps)
+        custombackend("publ:post [] " + draft + " " + voice_b64); //  + recps)
     } else {
         recps = tremola.chats[curr_chat].members.join(' ');
-        backend("priv:post [] " + draft + " " + voice_b64 + " " + recps);
+        custombackend("priv:post [] " + draft + " " + voice_b64 + " " + recps);
     }
     document.getElementById('draft').value = '';
 }
@@ -409,7 +409,7 @@ function play_voice(nm, ref) {
     var p = tremola.chats[nm].posts[ref];
     var d = new Date(p["when"]);
     d = d.toDateString() + ' ' + d.toTimeString().substring(0, 5);
-    backend("play:voice " + p["voice"] + " " + btoa(fid2display(p["from"])) + " " + btoa(d));
+    custombackend("play:voice " + p["voice"] + " " + btoa(fid2display(p["from"])) + " " + btoa(d));
 }
 
 function new_image_post() {
@@ -421,7 +421,7 @@ function new_image_post() {
     if (caption && caption.length > 0)
         draft += caption;
     var recps = tremola.chats[curr_chat].members.join(' ')
-    backend("priv:post " + btoa(draft) + " " + recps);
+    custombackend("priv:post " + btoa(draft) + " " + recps);
     curr_img_candidate = null;
     closeOverlay();
     setTimeout(function () { // let image rendering (fetching size) take place before we scroll
@@ -730,10 +730,10 @@ export function save_content_alias() {
     // share new alias with others via IAM message
     if(new_contact_id == myId) {
         if(deleteAlias) {
-            backend("iam " + btoa(""))
+            custombackend("iam " + btoa(""))
             c.iam = ""
         } else {
-            backend("iam " + btoa(val))
+            custombackend("iam " + btoa(val))
             c.iam = val
         }
     }
@@ -919,7 +919,7 @@ function import_id(json_str) {
         return false // wrong format
     }
 
-    backend("importSecret " + json['secret'])
+    custombackend("importSecret " + json['secret'])
     return true
 }
 
@@ -936,7 +936,6 @@ export function assignMenuOnClick() {
 // --- Interface to Kotlin side and local (browser) storage
 
 // Changes for socket library
-
 document.body.setAttribute('platform', process.platform)
 
 let incomingsocket;
@@ -1414,6 +1413,7 @@ export async function backend(cmdStr) { // send this to Kotlin (or simulate in c
         await appendContent(r, ebipf)
 
         b2f_new_event(e)
+        publicmsgposted(e)
     } else if (cmdStr[0] == 'kanban') {
         console.log('backend, kanban: ', cmdStr)
         var prev = cmdStr[2] //== "null" ? null : cmdStr[2]
