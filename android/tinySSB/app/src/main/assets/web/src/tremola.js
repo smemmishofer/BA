@@ -999,9 +999,10 @@ async function main () {
     initP2P().then(() => {
         try {
             p2pnetwork.on('message', buf => {
-                //console.log('before decoding text: ', buf)
+                console.log('before decoding text: ', buf)
 
-                var string = new TextDecoder().decode(buf.data);
+                var string = new TextDecoder().decode(buf);
+                console.log('decoded String: ', string)
                 var message = JSON.parse(string)
                 //console.log('Received P2P before decoding: ', string)
                 console.log('Received new P2P message: ', message)
